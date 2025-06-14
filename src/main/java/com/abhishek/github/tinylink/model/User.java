@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -26,4 +28,18 @@ public class User {
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Prefix> prefixes = new ArrayList<>();
+
+    public enum UserType {
+        BASE,
+        CORPORATE,
+        SPECIAL
+    }
+
 }
