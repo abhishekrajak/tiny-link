@@ -1,16 +1,19 @@
 package com.abhishek.github.tinylink.controller;
 
+import com.abhishek.github.tinylink.constant.ApiErrorCodes;
+import com.abhishek.github.tinylink.constant.ApiErrorMessages;
+import com.abhishek.github.tinylink.dto.ApiResponse;
+import com.abhishek.github.tinylink.dto.TinyLinkGenerateRequestDTO;
+import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.service.TinyLinkService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-@RestController
+@RestController()
 public class TinyLinkController {
 
     TinyLinkService tinyLinkService;
@@ -19,8 +22,18 @@ public class TinyLinkController {
         this.tinyLinkService = tinyLinkService;
     }
 
+    @PostMapping(value = "/api/v1/tiny-link")
+    public ApiResponse<?> addTinyLink(@RequestBody TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) {
+        boolean isSuccess = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
+        if (isSuccess) {
+            return ApiResponse.success(null);
+        } else {
+            return new ApiResponse<>(ApiErrorCodes.unknownErrorCode, ApiErrorMessages.unknownErrorMessage, null);
+        }
+    }
+
     @GetMapping(value = "/{tinyCode}")
-    public ResponseEntity<String> getTinyLink(@PathVariable String tinyCode){
+    public ResponseEntity<String> getTinyLink(@PathVariable String tinyCode) {
         Optional<String> url = tinyLinkService.getRedirectionUrl(tinyCode);
 
         if (url.isEmpty()) return ResponseEntity.notFound().build();

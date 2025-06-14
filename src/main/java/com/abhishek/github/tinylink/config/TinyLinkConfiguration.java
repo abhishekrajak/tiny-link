@@ -14,4 +14,6 @@ public class TinyLinkConfiguration {
      private int tinyUrlCodeLength;
 
      private String tinyLinkAllowedChars;
+
+     private int shortCodeGenerationMaxRetryCount;
 }
