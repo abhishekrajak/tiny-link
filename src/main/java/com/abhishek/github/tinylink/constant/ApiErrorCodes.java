@@ -7,4 +7,6 @@ public class ApiErrorCodes {
 
     public static String tinyCodeGenerationRetryFail = "TL-0001";
 
+    public static String prefixBelongsToOtherUser = "TL-0002";
+
 }
