@@ -16,6 +16,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.abhishek.github.tinylink.constant.StringConstants.BLANK;
+import static com.abhishek.github.tinylink.constant.StringConstants.NumericConstant.INT_ZERO;
+
+
 @Service
 @AllArgsConstructor
 public class TinyLinkService {
@@ -29,14 +33,14 @@ public class TinyLinkService {
 
         if (tinyLinkList.isEmpty()) return Optional.empty();
 
-        TinyLinkDTO tinyLinkDTO =  new TinyLinkDTO(tinyLinkList.get(0));
+        TinyLinkDTO tinyLinkDTO =  new TinyLinkDTO(tinyLinkList.get(INT_ZERO));
         return Optional.of(tinyLinkDTO.getRedirectionLink());
     }
 
     public boolean insertTinyLink(TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO) {
         User user = tinyLinkGenerateRequestDTO.getUser();
 
-        String tinyCode = Optional.ofNullable(tinyLinkGenerateRequestDTO.getTinyCode()).orElse("");
+        String tinyCode = Optional.ofNullable(tinyLinkGenerateRequestDTO.getTinyCode()).orElse(BLANK);
         if (user.getUserType() == User.UserType.BASE || tinyCode.isEmpty()) {
             tinyCode = UrlGenerator.generateShortCode(tinyLinkConfiguration.getTinyUrlCodeLength(),
                     tinyLinkConfiguration.getTinyLinkAllowedChars());
@@ -49,7 +53,7 @@ public class TinyLinkService {
         if (tinyCodePrefixExists && user.getUserType() == User.UserType.BASE) {
             isCustom = false;
             int maxRetryCount = tinyLinkConfiguration.getShortCodeGenerationMaxRetryCount();
-            for (int index = 0; index < maxRetryCount && tinyCodePrefixExists; index++) {
+            for (int index = INT_ZERO; index < maxRetryCount && tinyCodePrefixExists; index++) {
                 tinyCode = UrlGenerator.generateShortCode(tinyLinkConfiguration.getTinyUrlCodeLength(),
                         tinyLinkConfiguration.getTinyLinkAllowedChars());
                 tinyCodePrefixExists = tinyLinkRepository.existsPrefixConflict(tinyCode);
@@ -70,7 +74,7 @@ public class TinyLinkService {
         }
 
         TinyLink tinyLink = new TinyLink(tinyLinkGenerateRequestDTO.getTinyCode(), tinyLinkGenerateRequestDTO.getRedirectionLink(),
-                user, isCustom, "");
+                user, isCustom, BLANK);
         tinyLinkRepository.save(tinyLink);
         return true;
     }
