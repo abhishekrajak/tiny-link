@@ -1,6 +1,8 @@
 package com.abhishek.github.tinylink.constant;
 
 public class StringConstants {
+
+    public static final String  BLANK = "";
     public static class ApiPathConstant{
         public static final String VERSION = "v1";
         public static final String API = "api";
@@ -13,5 +15,9 @@ public class StringConstants {
     public static class ConfigConstant{
         public static final String API_URL = "app.url";
         private ConfigConstant(){}
+    }
+
+    public static class NumericConstant{
+        public static final int INT_ZERO = 0;
     }
 }
