@@ -9,6 +9,7 @@ import com.abhishek.github.tinylink.model.TinyLink;
 import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.TinyLinkRepository;
 import com.abhishek.github.tinylink.util.UrlGenerator;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +17,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class TinyLinkService {
 
-    TinyLinkRepository tinyLinkRepository;
+    private final TinyLinkRepository tinyLinkRepository;
 
-    TinyLinkConfiguration tinyLinkConfiguration;
-
-    @Autowired
-    public TinyLinkService(TinyLinkRepository tinyLinkRepository, TinyLinkConfiguration tinyLinkConfiguration) {
-        this.tinyLinkRepository = tinyLinkRepository;
-        this.tinyLinkConfiguration = tinyLinkConfiguration;
-    }
+    private final TinyLinkConfiguration tinyLinkConfiguration;
 
     public Optional<String> getRedirectionUrl(String tinyCode){
         List<TinyLink> tinyLinkList = tinyLinkRepository.findByTinyCode(tinyCode);
