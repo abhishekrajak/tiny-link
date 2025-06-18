@@ -49,7 +49,9 @@ public class DevDataInitializer implements CommandLineRunner {
         tinyLinkRepository.save(tinyLink);
 
         Prefix prefix = new Prefix("xoxo", user, Prefix.ReservedFor.SPECIAL);
+        Prefix prefix2 = new Prefix("abcd", user, Prefix.ReservedFor.SPECIAL);
         prefixRepository.save(prefix);
+        prefixRepository.save(prefix2);
 
         boolean isPrefixAlreadyExists = tinyLinkRepository.existsPrefixConflict("xoxo");
         boolean isPrefixAlreadyExists2 = tinyLinkRepository.existsPrefixConflict("mango");

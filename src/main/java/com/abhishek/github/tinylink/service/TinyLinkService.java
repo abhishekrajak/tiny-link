@@ -2,9 +2,11 @@ package com.abhishek.github.tinylink.service;
 
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
 import com.abhishek.github.tinylink.config.TinyLinkConfiguration;
+import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.TinyLinkDTO;
 import com.abhishek.github.tinylink.dto.TinyLinkGenerateRequestDTO;
 import com.abhishek.github.tinylink.exception.TinyLinkException;
+import com.abhishek.github.tinylink.model.Prefix;
 import com.abhishek.github.tinylink.model.TinyLink;
 import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.TinyLinkRepository;
@@ -46,7 +48,8 @@ public class TinyLinkService {
                     tinyLinkConfiguration.getTinyLinkAllowedChars());
         }
 
-        boolean tinyCodePrefixExists = tinyLinkRepository.existsPrefixConflict(tinyCode);
+        Optional<Prefix> firstMatchingPrefix = tinyLinkRepository.findFirstMatchingPrefix(tinyCode);
+        boolean tinyCodePrefixExists = firstMatchingPrefix.isPresent();
         boolean isCustom = true;
 
         // Check for prefix for BASE users
@@ -56,7 +59,8 @@ public class TinyLinkService {
             for (int index = INT_ZERO; index < maxRetryCount && tinyCodePrefixExists; index++) {
                 tinyCode = UrlGenerator.generateShortCode(tinyLinkConfiguration.getTinyUrlCodeLength(),
                         tinyLinkConfiguration.getTinyLinkAllowedChars());
-                tinyCodePrefixExists = tinyLinkRepository.existsPrefixConflict(tinyCode);
+                firstMatchingPrefix = tinyLinkRepository.findFirstMatchingPrefix(tinyCode);
+                tinyCodePrefixExists = firstMatchingPrefix.isPresent();
             }
 
             if (tinyCodePrefixExists) {
@@ -65,6 +69,15 @@ public class TinyLinkService {
         }
 
         // TODO for special and corporate user prefix can match so check if they are allowed that prefix if no then throw Exception
+        if (user.getUserType() == User.UserType.SPECIAL){
+            if (firstMatchingPrefix.isPresent()) {
+                User prefixOwner = firstMatchingPrefix.get().getUser();
+
+                if (prefixOwner != user){
+                    throw new TinyLinkException(ApiErrorCodes.prefixBelongsToOtherUser, ApiErrorMessages.prefixBelongsToOtherUser);
+                }
+            }
+        }
 
         // Check if the shortCode already present in db
         boolean tinyCodeAlreadyExists = tinyLinkRepository.existsTinyLinkByTinyCode(tinyCode);
