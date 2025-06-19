@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.abhishek.github.tinylink.constant.ApiErrorCodes.tinyCodeNotFound;
 import static com.abhishek.github.tinylink.constant.StringConstants.BLANK;
 import static com.abhishek.github.tinylink.constant.StringConstants.NumericConstant.INT_ZERO;
 
@@ -33,7 +34,9 @@ public class TinyLinkService {
     public Optional<String> getRedirectionUrl(String tinyCode){
         List<TinyLink> tinyLinkList = tinyLinkRepository.findByTinyCode(tinyCode);
 
-        if (tinyLinkList.isEmpty()) return Optional.empty();
+        if(tinyLinkList.isEmpty()){
+            throw new TinyLinkException(tinyCodeNotFound,"Tiny Code is not created for this request.");
+        }
 
         TinyLinkDTO tinyLinkDTO =  new TinyLinkDTO(tinyLinkList.get(INT_ZERO));
         return Optional.of(tinyLinkDTO.getRedirectionLink());

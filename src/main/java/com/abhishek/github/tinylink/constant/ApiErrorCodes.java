@@ -9,4 +9,6 @@ public class ApiErrorCodes {
 
     public static String prefixBelongsToOtherUser = "TL-0002";
 
+    public static String tinyCodeNotFound = "TL-0404";
+
 }
