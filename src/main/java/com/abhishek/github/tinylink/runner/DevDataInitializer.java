@@ -36,9 +36,6 @@ public class DevDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
-        System.out.println("xoxo");
-
         User user = new User();
         user.setEmailId("abhishekrajak100@gmail.com");
         user.setUserType(User.UserType.BASE);
