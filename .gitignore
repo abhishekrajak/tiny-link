@@ -6,6 +6,7 @@ target/
 
 # Property file
 src/main/resources/application.properties
+src/main/resources/application.yaml
 
 # Environment file
 .env
