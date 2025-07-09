@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -26,6 +24,12 @@ public class User {
     @Column(nullable = false, unique = true)
     private String emailId;
 
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -36,10 +40,25 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prefix> prefixes = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+
+    private String providerId;
+
+    private Boolean registrationCompleted;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> roles = new HashSet<>(); // "ROLE_ADMIN", "ROLE_USER"
+
     public enum UserType {
         BASE,
         CORPORATE,
         SPECIAL
+    }
+
+    public enum AuthProvider {
+        google,
+        local
     }
 
 }

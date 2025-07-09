@@ -36,31 +36,31 @@ public class DevDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        User user = new User();
-        user.setEmailId("abhishekrajak100@gmail.com");
-        user.setUserType(User.UserType.BASE);
-        user.setCreatedAt(java.time.Instant.now());
-        userRepository.save(user);
-
-        TinyLink tinyLink = new TinyLink("abcde", "https://www.github.com/abhishekrajak", user, true, "CUSTOM");
-        tinyLinkRepository.save(tinyLink);
-
-        Prefix prefix = new Prefix("xoxo", user, Prefix.ReservedFor.SPECIAL);
-        Prefix prefix2 = new Prefix("abcd", user, Prefix.ReservedFor.SPECIAL);
-        prefixRepository.save(prefix);
-        prefixRepository.save(prefix2);
-
-        boolean isPrefixAlreadyExists = tinyLinkRepository.existsPrefixConflict("xoxo");
-        boolean isPrefixAlreadyExists2 = tinyLinkRepository.existsPrefixConflict("mango");
-
-        System.out.println("isPrefixAlreadyExists = " + isPrefixAlreadyExists);
-        System.out.println("isPrefixAlreadyExists = " + isPrefixAlreadyExists2);
-
-        TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO = new TinyLinkGenerateRequestDTO(
-                "abcd", "https://www.linkedin.com", user
-        );
-
-        tinyLinkService.insertTinyLink(tinyLinkGenerateRequestDTO);
+//        User user = new User();
+//        user.setEmailId("abhishekrajak100@gmail.com");
+//        user.setUserType(User.UserType.BASE);
+//        user.setCreatedAt(java.time.Instant.now());
+//        userRepository.save(user);
+//
+//        TinyLink tinyLink = new TinyLink("abcde", "https://www.github.com/abhishekrajak", user, true, "CUSTOM");
+//        tinyLinkRepository.save(tinyLink);
+//
+//        Prefix prefix = new Prefix("xoxo", user, Prefix.ReservedFor.SPECIAL);
+//        Prefix prefix2 = new Prefix("abcd", user, Prefix.ReservedFor.SPECIAL);
+//        prefixRepository.save(prefix);
+//        prefixRepository.save(prefix2);
+//
+//        boolean isPrefixAlreadyExists = tinyLinkRepository.existsPrefixConflict("xoxo");
+//        boolean isPrefixAlreadyExists2 = tinyLinkRepository.existsPrefixConflict("mango");
+//
+//        System.out.println("isPrefixAlreadyExists = " + isPrefixAlreadyExists);
+//        System.out.println("isPrefixAlreadyExists = " + isPrefixAlreadyExists2);
+//
+//        TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO = new TinyLinkGenerateRequestDTO(
+//                "abcd", "https://www.linkedin.com", user
+//        );
+//
+//        tinyLinkService.insertTinyLink(tinyLinkGenerateRequestDTO);
     }
 
 }

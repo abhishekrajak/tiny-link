@@ -1,6 +1,7 @@
 package com.abhishek.github.tinylink.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
@@ -36,7 +37,6 @@ public class OAuthTokenValidatorUtil {
             String iss = (String) payloadMap.get("iss");
             return iss;
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
