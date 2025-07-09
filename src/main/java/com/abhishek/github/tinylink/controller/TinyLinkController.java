@@ -22,7 +22,7 @@ public class TinyLinkController {
     private final TinyLinkService tinyLinkService;
 
     // value = /api/v1/tiny-link
-    @PostMapping(value = SLASH+API+SLASH+VERSION+SLASH+TINY_LINK)
+    @PostMapping(value = "/api/v1/tiny-link")
     public ApiResponse<?> addTinyLink(@RequestBody TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) {
         boolean isSuccess = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
         if (isSuccess) {
@@ -32,8 +32,7 @@ public class TinyLinkController {
         }
     }
 
-    // value = /{tinyCode}
-    @GetMapping(value = SLASH + PATH_VARIABLE_TINY_CODE)
+    @GetMapping(value = "/{tinyCode}")
     public ResponseEntity<String> getTinyLink(@PathVariable String tinyCode) {
         Optional<String> url = tinyLinkService.getRedirectionUrl(tinyCode);
 
