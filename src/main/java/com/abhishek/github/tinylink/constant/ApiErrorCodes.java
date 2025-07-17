@@ -13,4 +13,6 @@ public class ApiErrorCodes {
 
     public static String userNotFound = "TL_0003";
 
+    public static String clientUrlException = "TL_0004";
+
 }

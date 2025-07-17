@@ -17,6 +17,12 @@ public class GoogleAuthConfig {
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     public String googleClientSecret;
 
+    @Value("${app.url.client-redirect-url}")
+    public String clientRedirectUrl;
+
+    @Value("${app.url.redirect-uri}")
+    public String redirectUri;
+
     @Bean
     public GoogleIdTokenVerifier googleIdTokenVerifier() {
         return new GoogleIdTokenVerifier.Builder(
