@@ -15,4 +15,6 @@ public class ApiErrorCodes {
 
     public static String clientUrlException = "TL_0004";
 
+    public static String tokenFetchFailed = "TL_0005";
+
 }
