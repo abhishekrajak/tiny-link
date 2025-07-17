@@ -2,6 +2,7 @@ package com.abhishek.github.tinylink.controller;
 
 import com.abhishek.github.tinylink.config.GoogleAuthConfig;
 import com.abhishek.github.tinylink.dto.GoogleAuthRequest;
+import com.abhishek.github.tinylink.exception.TinyLinkException;
 import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.service.AuthService;
@@ -67,28 +68,9 @@ public class AuthController {
 
         String code = googleAuthRequest.getToken();
 
-        RestTemplate restTemplate = new RestTemplate();
+        String token = authService.getAccessToken(code, googleAuthConfig);
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("code", code);
-        params.add("client_id", googleAuthConfig.googleClientId);
-        params.add("client_secret", googleAuthConfig.googleClientSecret);
-        params.add("redirect_uri", "http://localhost:8080/login/oauth2/code/google");
-        params.add("grant_type", "authorization_code");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                "https://oauth2.googleapis.com/token", request, String.class);
-
-        // Parse response for access_token, etc.
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> body = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
-        String token = body.get("id_token").toString();
-        GoogleIdToken.Payload payload = verifyGoogleToken(token);
+        GoogleIdToken.Payload payload = authService.verifyGoogleToken(token);
 
         String email = payload.getEmail();
         String name = (String) payload.get("name");
@@ -120,11 +102,5 @@ public class AuthController {
     }
 
 
-    private GoogleIdToken.Payload verifyGoogleToken(String idToken) throws Exception {
-        GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
-        if (googleIdToken == null) {
-            throw new RuntimeException("Invalid Google ID token");
-        }
-        return googleIdToken.getPayload();
-    }
+
 }
