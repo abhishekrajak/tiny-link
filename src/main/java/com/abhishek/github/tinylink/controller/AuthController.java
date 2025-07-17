@@ -42,16 +42,18 @@ public class AuthController {
     private final GoogleAuthConfig googleAuthConfig;
     private final UserRepository userRepository;
     private final AuthService authService;
+    private final UserService userService;
 
     @Autowired
     AuthController(JwtTokenUtil jwtTokenUtil, GoogleIdTokenVerifier googleIdTokenVerifier,
                    GoogleAuthConfig googleAuthConfig, UserRepository userRepository,
-                   AuthService authService) {
+                   AuthService authService, UserService userService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.googleIdTokenVerifier = googleIdTokenVerifier;
         this.googleAuthConfig = googleAuthConfig;
         this.userRepository = userRepository;
         this.authService = authService;
+        this.userService = userService;
     }
 
     @GetMapping("/code/google")
@@ -72,31 +74,10 @@ public class AuthController {
 
         GoogleIdToken.Payload payload = authService.verifyGoogleToken(token);
 
-        String email = payload.getEmail();
-        String name = (String) payload.get("name");
-
-        User user;
-        Optional<User> userOptional = userRepository.findByEmailId(email);
-        if (userOptional.isEmpty()) {
-            User newUser = new User();
-            newUser.setEmailId(email);
-            newUser.setName(name);
-            newUser.setUsername(email);
-            newUser.setProvider(User.AuthProvider.google);
-            newUser.setProviderId(payload.getSubject());
-            newUser.setPassword("");
-            newUser.setRegistrationCompleted(payload.getEmailVerified());
-            newUser.setRoles(Collections.singleton("ROLE_USER"));
-            newUser.setUserType(User.UserType.BASE);
-            newUser.setCreatedAt(Instant.now());
-            user = userRepository.save(newUser);
-        } else {
-            user = userOptional.get();
-        }
+        User user = userService.processOAuthPostLogin(payload);
 
         Map<String, String> map = new HashMap<>();
-        map.put("email", email);
-        map.put("name", name);
+        map.put("user", user != null ? "true" : "false");
 
         return ResponseEntity.ok(map);
     }
