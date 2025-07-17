@@ -2,8 +2,11 @@ package com.abhishek.github.tinylink.service;
 
 import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.UserRepository;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -15,9 +18,31 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User processOAuthPostLogin(String email, String name) {
+    public User processOAuthPostLogin(GoogleIdToken.Payload payload) {
 
-        return null;
+        String email = payload.getEmail();
+        String name = (String) payload.get("name");
+
+        User user;
+        Optional<User> userOptional = userRepository.findByEmailId(email);
+        if (userOptional.isEmpty()) {
+            User newUser = new User();
+            newUser.setEmailId(email);
+            newUser.setName(name);
+            newUser.setUsername(email);
+            newUser.setProvider(User.AuthProvider.google);
+            newUser.setProviderId(payload.getSubject());
+            newUser.setPassword("");
+            newUser.setRegistrationCompleted(payload.getEmailVerified());
+            newUser.setRoles(Collections.singleton("ROLE_USER"));
+            newUser.setUserType(User.UserType.BASE);
+            newUser.setCreatedAt(Instant.now());
+            user = userRepository.save(newUser);
+        } else {
+            user = userOptional.get();
+        }
+
+        return user;
     }
 
     public User completeRegistration(String email) {
