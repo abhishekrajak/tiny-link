@@ -1,22 +1,17 @@
 package com.abhishek.github.tinylink.util;
 
 import com.abhishek.github.tinylink.model.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.util.*;
 
 @Component
 public class JwtTokenUtil {
@@ -39,6 +34,8 @@ public class JwtTokenUtil {
         return Jwts.builder()
                 .subject(user.getUserId().toString())
                 .claim("emailId", user.getEmailId())
+                .claim("roles", user.getRoles())
+                .issuer("www.tinylink.com")
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
@@ -74,5 +71,19 @@ public class JwtTokenUtil {
                 .getPayload();
 
         return claims.getSubject();
+    }
+
+    public Set<String> getRolesFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        Object rolesObj = claims.get("roles");
+        if (rolesObj instanceof List<?>) {
+            return new HashSet<>((List<String>) rolesObj);
+        }
+        return Collections.emptySet();
     }
 }
