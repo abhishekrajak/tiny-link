@@ -6,6 +6,7 @@ TinyLink is a robust and scalable URL shortening service built with Spring Boot.
 
 - **URL Shortening**: Convert long URLs into short, shareable links
 - **Custom Short Codes**: Option to create custom short codes for URLs (for special users)
+- **User Authentication**: Secure OAuth 2.0 login with Google
 - **Multi-User Support**: Different user types with varying permissions
 - **Automatic Code Generation**: Generates random short codes when custom codes aren't provided
 - **Prefix Management**: Support for prefix-based URL routing
@@ -13,31 +14,54 @@ TinyLink is a robust and scalable URL shortening service built with Spring Boot.
 
 ## Tech Stack
 
-- **Backend**: Java 11+
-- **Framework**: Spring Boot 2.7.x
+- **Backend**: Java 17
+- **Framework**: Spring Boot 3.x
+- **Security**: Spring Security with JWT
 - **Database**: JPA with Hibernate
 - **Build Tool**: Maven
-- **Testing**: JUnit, Mockito
+- **Testing**: JUnit 5, Mockito
 
 ## API Endpoints
 
-### 1. Create a TinyLink
+### Authentication
 
+#### 1. Google OAuth Login
 ```http
-POST /api/v1/tiny-link
+GET /login/oauth2/code/google?code={auth_code}
+```
+Initiates OAuth flow with Google. Redirects to the callback URL with authentication code.
+
+#### 2. Create Account/Login with Google
+```http
+POST /login/oauth2/account/create
 Content-Type: application/json
 
 {
-  "user": {
-    "userType": "BASE"
-  },
+  "token": "google_auth_token"
+}
+```
+
+### URL Management
+
+#### 1. Create a TinyLink
+```http
+POST /api/v1/tiny-link
+Content-Type: application/json
+Authorization: Bearer {jwt_token}
+
+{
   "tinyCode": "custom123",  // Optional
   "redirectionLink": "https://example.com/very/long/url"
 }
 ```
 
-### 2. Redirect to Original URL
+#### 2. Get All User's Links
+```http
+GET /api/v1/links
+Authorization: Bearer {jwt_token}
+```
 
+#### 3. Redirect to Original URL
 ```http
 GET /{tinyCode}
 ```
@@ -52,42 +76,53 @@ GET /{tinyCode}
 
 ### Prerequisites
 
-- Java 11 or higher
+- Java 17 or higher
 - Maven 3.6 or higher
-- MySQL/PostgreSQL (or your preferred JPA-compatible database)
+- PostgreSQL (or your preferred JPA-compatible database)
+- Google OAuth 2.0 credentials
 
 ### Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/tiny-link.git
+   git clone https://github.com/abhishekrajak/tiny-link.git
    cd tiny-link
    ```
 
-2. Configure the database in `application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/tinylink
-   spring.datasource.username=your_username
-   spring.datasource.password=your_password
-   spring.jpa.hibernate.ddl-auto=update
+2. Configure the application:
+   ```bash
+   cp src/main/resources/application-example.yml src/main/resources/application.yml
+   # Update application.yml with your database and OAuth credentials
    ```
 
 3. Build and run the application:
    ```bash
-   mvn spring-boot:run
+   ./mvnw spring-boot:run
    ```
-
-The application will be available at `http://localhost:8080`
 
 ## Configuration
 
-Customize the application behavior by modifying `application.properties`:
+Customize the application behavior by modifying `application.yml`:
 
-```properties
-# TinyLink configuration
-tinylink.tiny-url.code-length=6
-tinylink.tiny-url.allowed-chars=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
-tinylink.tiny-url.generation.max-retry=10
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tinylink
+    username: your_username
+    password: your_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret: your_jwt_secret
+  expiration: 86400000  # 24 hours in milliseconds
+
+google:
+  client:
+    clientId: your_google_client_id
+    clientSecret: your_google_client_secret
+    redirectUri: http://localhost:8080/login/oauth2/code/google
 ```
 
 ## Error Handling
@@ -102,6 +137,22 @@ The API returns standardized error responses with the following format:
 }
 ```
 
+### Common Error Codes
+
+- `AUTH_001`: Authentication required
+- `AUTH_002`: Invalid or expired token
+- `TL_001`: Tiny code not found
+- `TL_002`: Tiny code generation failed
+- `TL_003`: Tiny code already exists
+
+## Security
+
+- JWT-based authentication
+- OAuth 2.0 with Google
+- Role-based access control
+- CSRF protection
+- CORS configuration
+
 ## Contributing
 
 1. Fork the repository
@@ -113,8 +164,3 @@ The API returns standardized error responses with the following format:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Built with ❤️ using Spring Boot
-- Inspired by popular URL shorteners like Bitly and TinyURL
