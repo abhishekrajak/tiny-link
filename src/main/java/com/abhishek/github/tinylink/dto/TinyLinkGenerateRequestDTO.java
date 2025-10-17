@@ -10,6 +10,5 @@ import lombok.Data;
 public class TinyLinkGenerateRequestDTO {
    private String tinyCode;
    private String redirectionLink;
-   private User user;
 
 }

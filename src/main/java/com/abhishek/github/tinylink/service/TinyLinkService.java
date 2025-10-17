@@ -5,18 +5,23 @@ import com.abhishek.github.tinylink.config.TinyLinkConfiguration;
 import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.TinyLinkDTO;
 import com.abhishek.github.tinylink.dto.TinyLinkGenerateRequestDTO;
+import com.abhishek.github.tinylink.dto.TinyLinkResponseDTO;
 import com.abhishek.github.tinylink.exception.TinyLinkException;
 import com.abhishek.github.tinylink.model.Prefix;
 import com.abhishek.github.tinylink.model.TinyLink;
 import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.TinyLinkRepository;
+import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.util.UrlGenerator;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.abhishek.github.tinylink.constant.ApiErrorCodes.tinyCodeNotFound;
 import static com.abhishek.github.tinylink.constant.StringConstants.BLANK;
@@ -28,6 +33,8 @@ import static com.abhishek.github.tinylink.constant.StringConstants.NumericConst
 public class TinyLinkService {
 
     private final TinyLinkRepository tinyLinkRepository;
+
+    private final UserRepository userRepository;
 
     private final TinyLinkConfiguration tinyLinkConfiguration;
 
@@ -42,8 +49,8 @@ public class TinyLinkService {
         return Optional.of(tinyLinkDTO.getRedirectionLink());
     }
 
-    public boolean insertTinyLink(TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO) {
-        User user = tinyLinkGenerateRequestDTO.getUser();
+    public boolean insertTinyLink(TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO) throws Exception {
+        User user = getUserViaAuthentication();
 
         String tinyCode = Optional.ofNullable(tinyLinkGenerateRequestDTO.getTinyCode()).orElse(BLANK);
         if (user.getUserType() == User.UserType.BASE || tinyCode.isEmpty()) {
@@ -93,5 +100,40 @@ public class TinyLinkService {
                 user, isCustom, BLANK);
         tinyLinkRepository.save(tinyLink);
         return true;
+    }
+
+    User getUserViaAuthentication() throws Exception {
+        String userId = getUserIdFromToken();
+        Optional<User> user = userRepository.findById(UUID.fromString(userId));
+
+        if (user.isEmpty()){
+            throw new Exception("User not found invalid UUID");
+        }
+
+        return user.get();
+    }
+
+    String getUserIdFromToken() throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()){
+            throw new Exception("User is not authenticated");
+        }
+
+        String userId = authentication.getName();
+
+        return userId;
+    }
+
+    public List<TinyLinkResponseDTO> getAllTinyLinks() throws Exception {
+        String userId = getUserIdFromToken();
+
+        List<TinyLink> links =
+                tinyLinkRepository.findByUserId(UUID.fromString(userId));
+
+        return links.stream().map(item -> new TinyLinkResponseDTO(
+                item.getTinyCode(), item.getRedirectionUrl(),
+                item.isCustom(), item.getCreatedAt()
+        )).collect(Collectors.toList());
     }
 }

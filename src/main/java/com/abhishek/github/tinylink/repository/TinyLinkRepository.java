@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface TinyLinkRepository extends JpaRepository<TinyLink, Long> {
@@ -24,4 +25,7 @@ public interface TinyLinkRepository extends JpaRepository<TinyLink, Long> {
     Optional<Prefix> findFirstMatchingPrefix(@Param("code") String code);
 
     boolean existsTinyLinkByTinyCode(String tinyCode);
+
+    @Query("SELECT t from TinyLink t where t.user.userId = :userId")
+    List<TinyLink> findByUserId(@Param("userId") UUID userId);
 }

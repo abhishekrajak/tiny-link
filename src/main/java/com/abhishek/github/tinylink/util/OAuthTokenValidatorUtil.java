@@ -1,22 +1,27 @@
 package com.abhishek.github.tinylink.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 
 @Component
 public class OAuthTokenValidatorUtil {
 
+    @Value("${jwt.secret}")
+    private String secret;
+
     public String isTokenValid(String accessToken) {
 
-        String issuer = getIssuerIdFromToken(accessToken);
-        JwtDecoder decoder = JwtDecoders.fromIssuerLocation(issuer);
+        SecretKeySpec key = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        JwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key).build();
         Jwt jwt = decoder.decode(accessToken);
         if(jwt != null) {
             return (String) jwt.getClaims().get("sub");

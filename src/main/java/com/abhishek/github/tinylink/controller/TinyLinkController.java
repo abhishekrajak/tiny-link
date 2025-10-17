@@ -4,12 +4,15 @@ import com.abhishek.github.tinylink.constant.ApiErrorCodes;
 import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.ApiResponse;
 import com.abhishek.github.tinylink.dto.TinyLinkGenerateRequestDTO;
+import com.abhishek.github.tinylink.dto.TinyLinkResponseDTO;
 import com.abhishek.github.tinylink.service.TinyLinkService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -19,7 +22,7 @@ public class TinyLinkController {
     private final TinyLinkService tinyLinkService;
 
     @PostMapping(value = "/api/v1/tiny-link")
-    public ApiResponse<?> addTinyLink(@RequestBody TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) {
+    public ApiResponse<?> addTinyLink(@RequestBody TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
         boolean isSuccess = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
         if (isSuccess) {
             return ApiResponse.success(null);
@@ -38,5 +41,17 @@ public class TinyLinkController {
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.LOCATION, urlValue)
                 .build();
+    }
+
+    @GetMapping(value = "/api/v1/links")
+    public ApiResponse<?> getTinyLinkTest() {
+        try {
+            List<TinyLinkResponseDTO> links = tinyLinkService.getAllTinyLinks();
+            return ApiResponse.success(links);
+        } catch (Exception e) {
+            // Nothing to do add logs later
+        }
+
+        return new ApiResponse<>("XOXO", "NO DATA FOUND", null);
     }
 }

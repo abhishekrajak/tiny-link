@@ -1,26 +1,19 @@
 package com.abhishek.github.tinylink.config;
 
-//import com.abhishek.github.tinylink.filter.JwtAuthenticationFilter;
-import com.abhishek.github.tinylink.filter.OAuthValidationFilter;
+import com.abhishek.github.tinylink.filter.JwtAuthenticationFilter;
 import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.service.CustomOAuth2OidcUserService;
 import com.abhishek.github.tinylink.util.JwtTokenUtil;
-import com.abhishek.github.tinylink.util.OAuthTokenValidatorUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.Filter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -63,40 +56,26 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login/oauth2/**").permitAll()
-//                        .anyRequest().authenticated()
+                        .requestMatchers("/login/oauth2/**",
+                                "/{tinyCode}").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .csrf(csrf -> csrf.disable())
-//                .oauth2Login(oauth -> {
-//                    log.info("Configuring OAuth2 login...");
-//                    oauth.userInfoEndpoint(userInfo -> {
-//                        userInfo.oidcUserService(customOAuth2OidcUserService);
-//                        log.info("Configuring user info endpoint...");
-//                    });
-//                    oauth.successHandler(new OAuth2AuthenticationSuccessHandler(userRepository, objectMapper));
-//                })
-//                .oauth2ResourceServer(oauth ->
-//                        oauth.jwt(Customizer.withDefaults())
-//                )
-//                .addFilterBefore(
-//                        jwtAuthenticationFilter(),
-//                        UsernamePasswordAuthenticationFilter.class
-//                )
+                .addFilterBefore(
+                        jwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class
+                )
         ;
 
         log.info("Security filter chain configuration complete.");
         return http.build();
     }
 
-//    private JwtAuthenticationFilter jwtAuthenticationFilter() {
-//        return new JwtAuthenticationFilter(jwtTokenUtil, DefaultOAuth2OidcUserService());
-//    }
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        return JwtDecoders.fromOidcIssuerLocation("https://accounts.google.com");
+    private JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenUtil);
     }
+
 }
