@@ -1,6 +1,7 @@
 package com.abhishek.github.tinylink.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -13,7 +14,8 @@ public class TinyLink {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 12)
+    @Size(min = 7, max = 20, message = "Tiny code must be between 7 and 20 characters")
+    @Column(nullable = false, length = 20, unique = true)
     private String tinyCode;
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -45,6 +47,12 @@ public class TinyLink {
         this.isCustom = isCustom;
         this.codeType = codeType;
         this.createdAt = Instant.now();
+    }
+
+    public void updateDetails(String redirectionUrl) {
+        if (redirectionUrl != null) {
+            this.redirectionUrl = redirectionUrl;
+        }
     }
 
 }

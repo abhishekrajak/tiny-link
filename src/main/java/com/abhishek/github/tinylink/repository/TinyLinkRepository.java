@@ -14,7 +14,7 @@ import java.util.UUID;
 @Repository
 public interface TinyLinkRepository extends JpaRepository<TinyLink, Long> {
 
-    List<TinyLink> findByTinyCode(String tinyCode);
+    Optional<TinyLink> findByTinyCode(String tinyCode);
 
     @Query("SELECT COUNT(p) > 0 FROM Prefix p WHERE LOWER(LEFT(:code, LENGTH(p.prefix))) = LOWER(p.prefix)")
     boolean existsPrefixConflict(@Param("code") String code);

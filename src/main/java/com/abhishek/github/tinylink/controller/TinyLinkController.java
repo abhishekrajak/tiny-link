@@ -5,17 +5,21 @@ import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.ApiResponse;
 import com.abhishek.github.tinylink.dto.TinyLinkGenerateRequestDTO;
 import com.abhishek.github.tinylink.dto.TinyLinkResponseDTO;
+import com.abhishek.github.tinylink.dto.TinyLinkUpdateRequestDTO;
 import com.abhishek.github.tinylink.service.TinyLinkService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Validated
 @AllArgsConstructor
 public class TinyLinkController {
 
@@ -29,6 +33,15 @@ public class TinyLinkController {
         } else {
             return new ApiResponse<>(ApiErrorCodes.unknownErrorCode, ApiErrorMessages.unknownErrorMessage, null);
         }
+    }
+
+    @PatchMapping(value = "/api/v1/tiny-link")
+    public ApiResponse<?> updateTinyLink(@RequestBody @Valid TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
+        boolean isSuccess = tinyLinkService.updateTinyLink(tinyLinkUpdateRequestDTO);
+        if (isSuccess) {
+            return ApiResponse.success("Tiny Link Updated Successfully");
+        }
+        throw new Exception();
     }
 
     @GetMapping(value = "/{tinyCode}")

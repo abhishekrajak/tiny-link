@@ -6,6 +6,8 @@ import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.TinyLinkDTO;
 import com.abhishek.github.tinylink.dto.TinyLinkGenerateRequestDTO;
 import com.abhishek.github.tinylink.dto.TinyLinkResponseDTO;
+import com.abhishek.github.tinylink.dto.TinyLinkUpdateRequestDTO;
+import com.abhishek.github.tinylink.exception.AccessDeniedException;
 import com.abhishek.github.tinylink.exception.TinyLinkException;
 import com.abhishek.github.tinylink.model.Prefix;
 import com.abhishek.github.tinylink.model.TinyLink;
@@ -17,6 +19,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,17 +42,19 @@ public class TinyLinkService {
 
     private final TinyLinkConfiguration tinyLinkConfiguration;
 
-    public Optional<String> getRedirectionUrl(String tinyCode){
-        List<TinyLink> tinyLinkList = tinyLinkRepository.findByTinyCode(tinyCode);
+    @Transactional(readOnly = true)
+    public Optional<String> getRedirectionUrl(String tinyCode) {
+        Optional<TinyLink> tinyLink = tinyLinkRepository.findByTinyCode(tinyCode);
 
-        if(tinyLinkList.isEmpty()){
-            throw new TinyLinkException(tinyCodeNotFound,"Tiny Code is not created for this request.");
+        if (tinyLink.isEmpty()) {
+            throw new TinyLinkException(tinyCodeNotFound, "Tiny Code is not created for this request.");
         }
 
-        TinyLinkDTO tinyLinkDTO =  new TinyLinkDTO(tinyLinkList.get(INT_ZERO));
+        TinyLinkDTO tinyLinkDTO = new TinyLinkDTO(tinyLink.get());
         return Optional.of(tinyLinkDTO.getRedirectionLink());
     }
 
+    @Transactional
     public boolean insertTinyLink(TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO) throws Exception {
         User user = getUserViaAuthentication();
 
@@ -79,11 +85,11 @@ public class TinyLinkService {
         }
 
         // TODO for special and corporate user prefix can match so check if they are allowed that prefix if no then throw Exception
-        if (user.getUserType() == User.UserType.SPECIAL){
+        if (user.getUserType() == User.UserType.SPECIAL) {
             if (firstMatchingPrefix.isPresent()) {
                 User prefixOwner = firstMatchingPrefix.get().getUser();
 
-                if (prefixOwner != user){
+                if (prefixOwner != user) {
                     throw new TinyLinkException(ApiErrorCodes.prefixBelongsToOtherUser, ApiErrorMessages.prefixBelongsToOtherUser);
                 }
             }
@@ -106,7 +112,7 @@ public class TinyLinkService {
         String userId = getUserIdFromToken();
         Optional<User> user = userRepository.findById(UUID.fromString(userId));
 
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             throw new Exception("User not found invalid UUID");
         }
 
@@ -116,7 +122,7 @@ public class TinyLinkService {
     String getUserIdFromToken() throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !authentication.isAuthenticated()){
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new Exception("User is not authenticated");
         }
 
@@ -125,6 +131,7 @@ public class TinyLinkService {
         return userId;
     }
 
+    @Transactional(readOnly = true)
     public List<TinyLinkResponseDTO> getAllTinyLinks() throws Exception {
         String userId = getUserIdFromToken();
 
@@ -135,5 +142,28 @@ public class TinyLinkService {
                 item.getTinyCode(), item.getRedirectionUrl(),
                 item.isCustom(), item.getCreatedAt()
         )).collect(Collectors.toList());
+    }
+
+    public boolean updateTinyLink(TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
+        String userId = getUserIdFromToken();
+
+
+        Optional<TinyLink> tinyLink =
+                tinyLinkRepository.findByTinyCode(tinyLinkUpdateRequestDTO.getTinyCode());
+
+        if (tinyLink.isEmpty()) {
+            throw new TinyLinkException("XOXO123", "Tiny Link Not Found");
+        }
+
+        if (!tinyLink.get().getUser().getUserId().toString().equals(userId)) {
+            throw new AccessDeniedException("You are not the real user for this tiny link");
+        }
+
+        tinyLink.get().updateDetails(tinyLinkUpdateRequestDTO.getRedirectionLink());
+
+        tinyLinkRepository.save(tinyLink.get());
+
+        return true;
+
     }
 }
