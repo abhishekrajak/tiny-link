@@ -17,7 +17,7 @@ public class RoleService {
         this.userRepository = userRepo;
     }
 
-    public void assignRole(String email, String role) {
+    public void assignRole(String email, User.UserRole role) {
         User user = userRepository.findByEmailId(email)
                 .orElseThrow(() -> new TinyLinkException(ApiErrorCodes.userNotFound, "User not found."));
         user.getRoles().add(role);

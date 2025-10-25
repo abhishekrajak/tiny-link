@@ -51,7 +51,8 @@ public class User {
     private Boolean registrationCompleted;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> roles = new HashSet<>(); // "ROLE_ADMIN", "ROLE_USER"
+    @Enumerated(EnumType.STRING)
+    private Set<UserRole> roles = new HashSet<>(); // "ROLE_ADMIN", "ROLE_USER"
 
     public enum UserType {
         BASE,
@@ -62,6 +63,11 @@ public class User {
     public enum AuthProvider {
         google,
         local
+    }
+
+    public enum UserRole {
+        ROLE_USER,
+        ROLE_ADMIN,
     }
 
 }

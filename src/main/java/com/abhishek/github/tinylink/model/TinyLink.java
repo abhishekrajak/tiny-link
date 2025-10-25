@@ -28,7 +28,10 @@ public class TinyLink {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    private Instant expiresAt;
+    @Column(nullable = false)
+    private boolean isActive;
+
+    private Instant deactivatedAt;
 
     @Column(nullable = false)
     private boolean isCustom;
