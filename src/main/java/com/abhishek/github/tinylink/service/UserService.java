@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -36,7 +38,9 @@ public class UserService {
             newUser.setProviderId(payload.getSubject());
             newUser.setPassword("");
             newUser.setRegistrationCompleted(payload.getEmailVerified());
-            newUser.setRoles(Collections.singleton("ROLE_USER"));
+            Set<User.UserRole> roles = new HashSet<>();
+            roles.add(User.UserRole.ROLE_USER);
+            newUser.setRoles(roles);
             newUser.setUserType(User.UserType.BASE);
             newUser.setCreatedAt(Instant.now());
             user = userRepository.save(newUser);
