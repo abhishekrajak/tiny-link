@@ -1,26 +1,24 @@
 package com.abhishek.github.tinylink.service;
 
+import com.abhishek.github.tinylink.model.AuthProviderEntity;
 import com.abhishek.github.tinylink.model.CustomOidcUser;
 import com.abhishek.github.tinylink.model.User;
+import com.abhishek.github.tinylink.repository.AuthProviderRepository;
 import com.abhishek.github.tinylink.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2OidcUserService extends OidcUserService {
     private final UserRepository userRepository;
+    private final AuthProviderRepository authProviderRepository;
 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) {
@@ -31,32 +29,36 @@ public class CustomOAuth2OidcUserService extends OidcUserService {
         String email = oidcUser.getEmail();
         String name = oidcUser.getFullName();
 
-        String providerId = oidcUser.getSubject();
+        String providerUserId = oidcUser.getName();
 
         boolean isEmailVerified = oidcUser.getEmailVerified();
 
-        // Find or create user
-        User user = userRepository.findByEmailId(email)
-                .orElseGet(() -> {
+        String registrationId = userRequest.getClientRegistration().getRegistrationId().toUpperCase(Locale.ROOT);
+        AuthProviderEntity.AuthProvider provider = AuthProviderEntity.AuthProvider.valueOf(registrationId);
 
-                    // TODO add some code for new user
-                    User newUser = new User();
+        Optional<User> userOptional = authProviderRepository.findByProviderAndProviderUserId(
+                provider, providerUserId
+        ).map(AuthProviderEntity::getUser);
 
-                    newUser.setEmailId(email);
-                    newUser.setName(name);
-                    newUser.setUsername(email);
-                    newUser.setProvider(User.AuthProvider.google);
-                    newUser.setProviderId(providerId);
-                    newUser.setPassword("");
-                    newUser.setRegistrationCompleted(isEmailVerified);
-                    Set<User.UserRole> roles = new HashSet<>();
-                    roles.add(User.UserRole.ROLE_USER);
-                    newUser.setRoles(roles);
-                    newUser.setUserType(User.UserType.BASE);
-                    newUser.setCreatedAt(Instant.now());
-                    userRepository.save(newUser);
-                    return newUser;
-                });
+        User user = userOptional.orElseGet(() -> {
+            User newUser = new User();
+
+            newUser.setEmailId(email);
+            newUser.setName(name);
+            newUser.setUsername(email);
+            newUser.setPassword("");
+            newUser.setRegistrationCompleted(isEmailVerified);
+            Set<User.UserRole> roles = new HashSet<>();
+            roles.add(User.UserRole.ROLE_USER);
+            newUser.setRoles(roles);
+            newUser.setUserType(User.UserType.BASE);
+            newUser.setCreatedAt(Instant.now());
+            newUser.addAuthProvider(AuthProviderEntity.AuthProvider.GOOGLE, providerUserId);
+
+            userRepository.save(newUser);
+            return newUser;
+
+        });
 
         return new CustomOidcUser(oidcUser, user);
     }
