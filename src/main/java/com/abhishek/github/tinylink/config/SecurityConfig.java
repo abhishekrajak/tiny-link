@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNullApi;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,8 +24,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
     private final CustomOAuth2OidcUserService customOAuth2OidcUserService;
     private final JwtTokenUtil jwtTokenUtil;
 
@@ -31,8 +31,6 @@ public class SecurityConfig {
     SecurityConfig(UserRepository userRepository, ObjectMapper objectMapper,
                    CustomOAuth2OidcUserService customOAuth2OidcUserService,
                    JwtTokenUtil jwtTokenUtil) {
-        this.userRepository = userRepository;
-        this.objectMapper = objectMapper;
         this.customOAuth2OidcUserService = customOAuth2OidcUserService;
         this.jwtTokenUtil = jwtTokenUtil;
     }
@@ -60,6 +58,15 @@ public class SecurityConfig {
                                 "/{tinyCode}").permitAll()
                         .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.oidcUserService(
+                                customOAuth2OidcUserService)
+                        )
+                        .successHandler(customAuthenticationSuccessHandler())
+                        .failureHandler((request, response, exception) -> {
+                            response.sendError(HttpStatus.UNAUTHORIZED.value(), exception.getMessage());
+                        })
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -72,6 +79,11 @@ public class SecurityConfig {
 
         log.info("Security filter chain configuration complete.");
         return http.build();
+    }
+
+    @Bean
+    public OAuth2AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandler(jwtTokenUtil);
     }
 
     private JwtAuthenticationFilter jwtAuthenticationFilter() {
