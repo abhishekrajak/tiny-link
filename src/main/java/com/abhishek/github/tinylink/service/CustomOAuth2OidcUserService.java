@@ -40,6 +40,17 @@ public class CustomOAuth2OidcUserService extends OidcUserService {
                 provider, providerUserId
         ).map(AuthProviderEntity::getUser);
 
+        if (userOptional.isEmpty() && email != null) {
+            userOptional = userRepository.findByEmailId(email);
+
+            userOptional.ifPresent((user) -> {
+                if (!user.hasProvider(provider)){
+                    user.addAuthProvider(provider, providerUserId);
+                    userRepository.save(user);
+                }
+            });
+        }
+
         User user = userOptional.orElseGet(() -> {
             User newUser = new User();
 
@@ -48,16 +59,13 @@ public class CustomOAuth2OidcUserService extends OidcUserService {
             newUser.setUsername(email);
             newUser.setPassword("");
             newUser.setRegistrationCompleted(isEmailVerified);
-            Set<User.UserRole> roles = new HashSet<>();
-            roles.add(User.UserRole.ROLE_USER);
-            newUser.setRoles(roles);
+            newUser.setRoles(Set.of(User.UserRole.ROLE_USER));
             newUser.setUserType(User.UserType.BASE);
             newUser.setCreatedAt(Instant.now());
-            newUser.addAuthProvider(AuthProviderEntity.AuthProvider.GOOGLE, providerUserId);
+            newUser.addAuthProvider(provider, providerUserId);
 
             userRepository.save(newUser);
             return newUser;
-
         });
 
         return new CustomOidcUser(oidcUser, user);
