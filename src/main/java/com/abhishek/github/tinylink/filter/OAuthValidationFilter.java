@@ -1,6 +1,5 @@
 package com.abhishek.github.tinylink.filter;
 
-import ch.qos.logback.core.util.StringUtil;
 import com.abhishek.github.tinylink.util.OAuthTokenValidatorUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,7 +35,7 @@ public class OAuthValidationFilter extends OncePerRequestFilter {
         if (token != null) {
 
             String username = tokenValidatorUtil.isTokenValid(token);
-            if (StringUtil.isNullOrEmpty(username)) {
+            if (username == null || username.isEmpty()) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
                 return;
             }

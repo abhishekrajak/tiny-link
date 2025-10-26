@@ -1,7 +1,9 @@
 package com.abhishek.github.tinylink.service;
 
+import com.abhishek.github.tinylink.model.CustomOidcUser;
 import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -10,67 +12,52 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2OidcUserService extends OidcUserService {
-
-    private final UserRepository userRepo;
-
-    public CustomOAuth2OidcUserService(UserRepository userRepo) {
-        this.userRepo = userRepo;
-    }
+    private final UserRepository userRepository;
 
     @Override
-    public OidcUser loadUser(OidcUserRequest request) {
+    public OidcUser loadUser(OidcUserRequest userRequest) {
+        OidcUser oidcUser = super.loadUser(userRequest);
 
-                
-        try {
-            // 1. Load the user from the OAuth2 provider
-            OidcUser oauthUser = super.loadUser(request);
-            log.info("OAuth2 User loaded successfully");
-            
-            // 2. Extract claims
-            Map<String, Object> attributes = oauthUser.getAttributes();
-            log.info("User attributes: {}", attributes);
-            
-            String email = (String) attributes.get("email");
-            String name = (String) attributes.get("name");
-            String providerId = (String) attributes.get("sub");
-            
-            if (email == null) {
-                log.error("Email not found in OAuth2 user attributes");
-                throw new OAuth2AuthenticationException("Email not found in OAuth2 user");
-            }
+        // Extract user info from OIDC claims
+        Map<String, Object> attributes = oidcUser.getAttributes();
+        String email = oidcUser.getEmail();
+        String name = oidcUser.getFullName();
 
-            // 3. Create/update user
-            User user = userRepo.findByEmailId(email)
-                    .orElseGet(() -> {
-                        log.info("Creating new user for email: {}", email);
-                        User newUser = new User();
-                        newUser.setEmailId(email);
-                        newUser.setName(name);
-                        newUser.setUsername(email);
-                        newUser.setCreatedAt(java.time.Instant.now());
-                        newUser.setProvider(User.AuthProvider.google);
-                        newUser.setProviderId(providerId);
-                        newUser.setUserType(User.UserType.BASE);
-                        return userRepo.save(newUser);
-                    });
-            
-            log.info("User processed successfully. User ID: {}", user.getUserId());
-            
-            // 4. Return the OAuth2User with the original attributes
-            return new DefaultOidcUser(
-                    oauthUser.getAuthorities(),
-                    oauthUser.getIdToken(),
-                    oauthUser.getUserInfo(),
-                    "sub" // Name attribute key
-            );
-        } catch (Exception e) {
-            log.error("Error in CustomOAuth2UserService", e);
-            throw e;
-        }
+        String providerId = oidcUser.getSubject();
+
+        boolean isEmailVerified = oidcUser.getEmailVerified();
+
+        // Find or create user
+        User user = userRepository.findByEmailId(email)
+                .orElseGet(() -> {
+
+                    // TODO add some code for new user
+                    User newUser = new User();
+
+                    newUser.setEmailId(email);
+                    newUser.setName(name);
+                    newUser.setUsername(email);
+                    newUser.setProvider(User.AuthProvider.google);
+                    newUser.setProviderId(providerId);
+                    newUser.setPassword("");
+                    newUser.setRegistrationCompleted(isEmailVerified);
+                    Set<User.UserRole> roles = new HashSet<>();
+                    roles.add(User.UserRole.ROLE_USER);
+                    newUser.setRoles(roles);
+                    newUser.setUserType(User.UserType.BASE);
+                    newUser.setCreatedAt(Instant.now());
+                    userRepository.save(newUser);
+                    return newUser;
+                });
+
+        return new CustomOidcUser(oidcUser, user);
     }
 }
