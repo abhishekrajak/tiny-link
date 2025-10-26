@@ -43,10 +43,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prefix> prefixes = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    private AuthProvider provider;
 
-    private String providerId;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AuthProviderEntity> authProviders = new HashSet<>();
 
     private Boolean registrationCompleted;
 
@@ -54,15 +53,30 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Set<UserRole> roles = new HashSet<>(); // "ROLE_ADMIN", "ROLE_USER"
 
+    public void addAuthProvider(AuthProviderEntity.AuthProvider provider, String providerUserId) {
+        AuthProviderEntity authProvider = new AuthProviderEntity(this, provider, providerUserId);
+        this.authProviders.add(authProvider);
+    }
+
+    public void removeAuthProvider(AuthProviderEntity.AuthProvider provider) {
+        authProviders.removeIf(ap -> ap.getProvider() == provider);
+    }
+
+    public Optional<AuthProviderEntity> getAuthProvider(AuthProviderEntity.AuthProvider provider) {
+        return authProviders.stream()
+                .filter(ap -> ap.getProvider() == provider)
+                .findFirst();
+    }
+
+    public boolean hasProvider(AuthProviderEntity.AuthProvider provider) {
+        return authProviders.stream()
+                .anyMatch(ap -> ap.getProvider() == provider);
+    }
+
     public enum UserType {
         BASE,
         CORPORATE,
         SPECIAL
-    }
-
-    public enum AuthProvider {
-        google,
-        local
     }
 
     public enum UserRole {
