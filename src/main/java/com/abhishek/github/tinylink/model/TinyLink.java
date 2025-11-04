@@ -43,13 +43,14 @@ public class TinyLink {
     }
 
     public TinyLink(String tinyCode, String redirectionUrl,
-                    User user, boolean isCustom, String codeType) {
+                    User user, boolean isCustom, String codeType, boolean isActive) {
         this.tinyCode = tinyCode;
         this.redirectionUrl = redirectionUrl;
         this.user = user;
         this.isCustom = isCustom;
         this.codeType = codeType;
         this.createdAt = Instant.now();
+        this.isActive = isActive;
     }
 
     public void updateDetails(String redirectionUrl) {

@@ -55,7 +55,7 @@ public class TinyLinkService {
     }
 
     @Transactional
-    public boolean insertTinyLink(TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO) throws Exception {
+    public TinyLinkResponseDTO insertTinyLink(TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO) throws Exception {
         User user = getUserViaAuthentication();
 
         String tinyCode = Optional.ofNullable(tinyLinkGenerateRequestDTO.getTinyCode()).orElse(BLANK);
@@ -103,9 +103,11 @@ public class TinyLinkService {
         }
 
         TinyLink tinyLink = new TinyLink(tinyLinkGenerateRequestDTO.getTinyCode(), tinyLinkGenerateRequestDTO.getRedirectionLink(),
-                user, isCustom, BLANK);
-        tinyLinkRepository.save(tinyLink);
-        return true;
+                user, isCustom, BLANK, true);
+        TinyLink savedTinyLink = tinyLinkRepository.save(tinyLink);
+
+        return new TinyLinkResponseDTO(savedTinyLink.getTinyCode(), savedTinyLink.getRedirectionUrl(),
+                savedTinyLink.isCustom(), savedTinyLink.getCreatedAt());
     }
 
     User getUserViaAuthentication() throws Exception {

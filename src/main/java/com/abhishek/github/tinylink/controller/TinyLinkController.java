@@ -27,9 +27,9 @@ public class TinyLinkController {
 
     @PostMapping(value = "/api/v1/tiny-link")
     public ApiResponse<?> addTinyLink(@RequestBody TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
-        boolean isSuccess = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
-        if (isSuccess) {
-            return ApiResponse.success(null);
+        TinyLinkResponseDTO savedTinyLink = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
+        if (savedTinyLink != null) {
+            return ApiResponse.success(savedTinyLink);
         } else {
             return new ApiResponse<>(ApiErrorCodes.unknownErrorCode, ApiErrorMessages.unknownErrorMessage, null);
         }

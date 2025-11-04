@@ -3,6 +3,7 @@ package com.abhishek.github.tinylink.exception;
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
 import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,12 +13,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Objects;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(TinyLinkException.class)
     public ApiResponse<?> handleValidationExceptions(
             TinyLinkException exception) {
+        log.error("{} {}", exception.getErrorCode(), exception.getErrorMessage());
         return new ApiResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
     }
 
