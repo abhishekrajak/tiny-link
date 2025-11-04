@@ -55,6 +55,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login/oauth2/**",
+                                "/error",
                                 "/{tinyCode}").permitAll()
                         .anyRequest().authenticated()
                 )

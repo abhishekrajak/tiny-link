@@ -42,6 +42,23 @@ public class JwtTokenUtil {
                 .compact();
     }
 
+    public String generateToken(String userId, String email, String name, List<String> roles) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expiration);
+
+        return Jwts.builder()
+                .subject(userId)  // Using user ID as subject
+                .claim("userId", userId)  // Also include as claim for easy access
+                .claim("email", email)
+                .claim("name", name)
+                .claim("roles", roles)
+                .issuer("www.tinylink.com")
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
