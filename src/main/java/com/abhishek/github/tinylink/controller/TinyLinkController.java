@@ -26,7 +26,7 @@ public class TinyLinkController {
     private final TinyLinkService tinyLinkService;
 
     @PostMapping(value = "/api/v1/tiny-link")
-    public ApiResponse<?> addTinyLink(@RequestBody TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
+    public ApiResponse<?> addTinyLink(@RequestBody @Valid TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
         TinyLinkResponseDTO savedTinyLink = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
         if (savedTinyLink != null) {
             return ApiResponse.success(savedTinyLink);
