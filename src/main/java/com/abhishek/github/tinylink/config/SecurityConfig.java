@@ -7,10 +7,12 @@ import com.abhishek.github.tinylink.util.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNullApi;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,6 +28,9 @@ public class SecurityConfig {
 
     private final CustomOAuth2OidcUserService customOAuth2OidcUserService;
     private final JwtTokenUtil jwtTokenUtil;
+
+    @Value("app.url.base-url")
+    private String frontEndBaseUrl;
 
     @Autowired
     SecurityConfig(UserRepository userRepository, ObjectMapper objectMapper,
@@ -53,6 +58,7 @@ public class SecurityConfig {
         log.info("Configuring security filter chain...");
 
         http
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login/oauth2/**",
                                 "/error",
