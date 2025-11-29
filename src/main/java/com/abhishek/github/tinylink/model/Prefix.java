@@ -24,7 +24,7 @@ public class Prefix {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private ReservedFor reservedFor;
 
     @Column(nullable = false, updatable = false)

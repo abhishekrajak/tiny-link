@@ -24,19 +24,19 @@ public class User {
     @Column(nullable = false, unique = true)
     private String emailId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String password;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
@@ -51,6 +51,11 @@ public class User {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    )
+    @Column(name = "roles", length = 20)
     private Set<UserRole> roles = new HashSet<>(); // "ROLE_ADMIN", "ROLE_USER"
 
     public void addAuthProvider(AuthProviderEntity.AuthProvider provider, String providerUserId) {
