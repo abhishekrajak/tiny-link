@@ -36,7 +36,7 @@ public class TinyLink {
     @Column(nullable = false)
     private boolean isCustom;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String codeType;
 
     public TinyLink() {

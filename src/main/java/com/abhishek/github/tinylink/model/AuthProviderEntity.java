@@ -26,10 +26,10 @@ public class AuthProviderEntity {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private AuthProvider provider;
 
-    @Column(name = "provider_user_id", nullable = false)
+    @Column(name = "provider_user_id", nullable = false, length = 100)
     private String providerUserId;
 
     @Column(name = "created_at", nullable = false, updatable = false)
