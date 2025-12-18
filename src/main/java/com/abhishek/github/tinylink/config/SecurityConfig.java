@@ -29,7 +29,7 @@ public class SecurityConfig {
     private final CustomOAuth2OidcUserService customOAuth2OidcUserService;
     private final JwtTokenUtil jwtTokenUtil;
 
-    @Value("app.url.base-url")
+    @Value("${app.url.base-url}")
     private String frontEndBaseUrl;
 
     @Autowired
@@ -46,7 +46,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3333") // Flutter web origin
+                        .allowedOrigins(frontEndBaseUrl) // Flutter web origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*");
             }
@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login/oauth2/**",
                                 "/error",
+                                "/actuator/*",
                                 "/{tinyCode}").permitAll()
                         .anyRequest().authenticated()
                 )
