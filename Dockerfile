@@ -8,7 +8,6 @@ COPY pom.xml .
 COPY mvnw .
 
 RUN chmod +x ./mvnw
-RUN ./mvnw -B dependency:go-offline
 
 # now copy source
 COPY src src
