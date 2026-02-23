@@ -6,7 +6,6 @@ WORKDIR /app
 # copy only pom first (better caching)
 COPY pom.xml .
 COPY mvnw .
-COPY .mvn .mvn
 
 RUN chmod +x ./mvnw
 RUN ./mvnw -B dependency:go-offline
