@@ -3,16 +3,19 @@ FROM eclipse-temurin:17-jdk-jammy AS builder
 
 WORKDIR /app
 
+# Install Maven
+RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
+
 # copy only pom first (better caching)
 COPY pom.xml .
-COPY mvnw .
 
-RUN chmod +x ./mvnw
+# download dependencies (better caching)
+RUN mvn dependency:go-offline
 
 # now copy source
 COPY src src
 
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 
 # ---------- Runtime stage ----------
