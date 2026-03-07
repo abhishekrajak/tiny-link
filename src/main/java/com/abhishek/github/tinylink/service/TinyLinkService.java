@@ -3,10 +3,7 @@ package com.abhishek.github.tinylink.service;
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
 import com.abhishek.github.tinylink.config.TinyLinkConfiguration;
 import com.abhishek.github.tinylink.constant.ApiErrorMessages;
-import com.abhishek.github.tinylink.dto.TinyLinkDTO;
-import com.abhishek.github.tinylink.dto.TinyLinkGenerateRequestDTO;
-import com.abhishek.github.tinylink.dto.TinyLinkResponseDTO;
-import com.abhishek.github.tinylink.dto.TinyLinkUpdateRequestDTO;
+import com.abhishek.github.tinylink.dto.*;
 import com.abhishek.github.tinylink.exception.AccessDeniedException;
 import com.abhishek.github.tinylink.exception.TinyLinkException;
 import com.abhishek.github.tinylink.model.LinkStatus;
@@ -162,6 +159,25 @@ public class TinyLinkService {
         tinyLink.get().updateDetails(tinyLinkUpdateRequestDTO.getRedirectionLink());
 
         tinyLinkRepository.save(tinyLink.get());
+
+        return true;
+
+    }
+
+    @Transactional
+    public boolean updateTinyLinkStatus(TinyLinkStatusUpdateRequestDTO dto) throws Exception{
+
+        String userId = getUserIdFromToken();
+
+        int updated = tinyLinkRepository.updateTinyLinkStatus(
+                UUID.fromString(userId),
+                dto.getTinyCode(),
+                dto.getStatus().name()
+        );
+
+        if (updated == 0) {
+            throw new TinyLinkException("LINK_NOT_FOUND", "Tiny Link not found or access denied");
+        }
 
         return true;
 

@@ -25,7 +25,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ApiResponse<?> handleAllExceptions() {
+    public ApiResponse<?> handleAllExceptions(Exception ex) {
+        log.error("Unexpected error : ", ex);
         return new ApiResponse<>(ApiErrorCodes.unknownErrorCode, ApiErrorMessages.unknownErrorMessage, null);
     }
 
