@@ -28,8 +28,9 @@ public class TinyLink {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean isActive;
+    private LinkStatus status = LinkStatus.ACTIVE;
 
     private Instant deactivatedAt;
 
@@ -43,14 +44,14 @@ public class TinyLink {
     }
 
     public TinyLink(String tinyCode, String redirectionUrl,
-                    User user, boolean isCustom, String codeType, boolean isActive) {
+                    User user, boolean isCustom, String codeType, LinkStatus status) {
         this.tinyCode = tinyCode;
         this.redirectionUrl = redirectionUrl;
         this.user = user;
         this.isCustom = isCustom;
         this.codeType = codeType;
         this.createdAt = Instant.now();
-        this.isActive = isActive;
+        this.status = status;
     }
 
     public void updateDetails(String redirectionUrl) {
