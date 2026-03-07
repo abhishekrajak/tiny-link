@@ -2,10 +2,7 @@ package com.abhishek.github.tinylink.controller;
 
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
 import com.abhishek.github.tinylink.constant.ApiErrorMessages;
-import com.abhishek.github.tinylink.dto.ApiResponse;
-import com.abhishek.github.tinylink.dto.TinyLinkGenerateRequestDTO;
-import com.abhishek.github.tinylink.dto.TinyLinkResponseDTO;
-import com.abhishek.github.tinylink.dto.TinyLinkUpdateRequestDTO;
+import com.abhishek.github.tinylink.dto.*;
 import com.abhishek.github.tinylink.service.TinyLinkService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -35,7 +32,7 @@ public class TinyLinkController {
         }
     }
 
-    @PatchMapping(value = "/api/v1/tiny-link")
+    @PatchMapping(value = "/api/v1/tiny-link/url")
     public ApiResponse<?> updateTinyLink(@RequestBody @Valid TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
         boolean isSuccess = tinyLinkService.updateTinyLink(tinyLinkUpdateRequestDTO);
         if (isSuccess) {
@@ -66,5 +63,20 @@ public class TinyLinkController {
         }
 
         return new ApiResponse<>("XOXO", "NO DATA FOUND", null);
+    }
+
+    @PatchMapping(value = "/api/v1/tiny-link/status")
+    public ApiResponse<?> updateTinyLinkStatus(
+            @Valid @RequestBody
+            TinyLinkStatusUpdateRequestDTO dto) throws Exception {
+
+        boolean result = tinyLinkService.updateTinyLinkStatus(dto);
+
+        if (result){
+            return ApiResponse.success(null);
+        } else {
+            return new ApiResponse<>(ApiErrorCodes.unknownErrorCode, ApiErrorMessages.unknownErrorMessage, null);
+        }
+
     }
 }

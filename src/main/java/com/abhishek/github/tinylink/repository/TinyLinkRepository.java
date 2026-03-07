@@ -3,6 +3,7 @@ package com.abhishek.github.tinylink.repository;
 import com.abhishek.github.tinylink.model.Prefix;
 import com.abhishek.github.tinylink.model.TinyLink;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -28,4 +29,9 @@ public interface TinyLinkRepository extends JpaRepository<TinyLink, Long> {
 
     @Query("SELECT t from TinyLink t where t.user.userId = :userId")
     List<TinyLink> findByUserId(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query(value = "UPDATE tiny_links SET status = :status WHERE user_id = :userId AND tiny_code = :tinyCode", nativeQuery = true)
+    int updateTinyLinkStatus(@Param("userId") UUID userId, @Param("tinyCode") String
+                              tinyCode, @Param("status") String status);
 }
