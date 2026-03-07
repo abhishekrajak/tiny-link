@@ -9,6 +9,7 @@ import com.abhishek.github.tinylink.dto.TinyLinkResponseDTO;
 import com.abhishek.github.tinylink.dto.TinyLinkUpdateRequestDTO;
 import com.abhishek.github.tinylink.exception.AccessDeniedException;
 import com.abhishek.github.tinylink.exception.TinyLinkException;
+import com.abhishek.github.tinylink.model.LinkStatus;
 import com.abhishek.github.tinylink.model.Prefix;
 import com.abhishek.github.tinylink.model.TinyLink;
 import com.abhishek.github.tinylink.model.User;
@@ -103,7 +104,7 @@ public class TinyLinkService {
         }
 
         TinyLink tinyLink = new TinyLink(tinyLinkGenerateRequestDTO.getTinyCode(), tinyLinkGenerateRequestDTO.getRedirectionLink(),
-                user, isCustom, BLANK, true);
+                user, isCustom, BLANK, LinkStatus.ACTIVE);
         TinyLink savedTinyLink = tinyLinkRepository.save(tinyLink);
 
         return new TinyLinkResponseDTO(savedTinyLink.getTinyCode(), savedTinyLink.getRedirectionUrl(),

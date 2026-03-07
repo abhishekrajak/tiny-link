@@ -1,0 +1,10 @@
+ALTER TABLE tiny_links
+DROP COLUMN is_active;
+
+ALTER TABLE tiny_links
+ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE';
+
+
+ALTER TABLE tiny_links
+ADD CONSTRAINT check_tiny_links_status
+CHECK (status IN ('ACTIVE', 'INACTIVE', 'EXPIRED', 'ARCHIVED', 'BANNED'));
