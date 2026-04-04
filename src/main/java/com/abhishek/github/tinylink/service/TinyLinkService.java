@@ -99,7 +99,7 @@ public class TinyLinkService {
             throw new TinyLinkException(ApiErrorCodes.tinyCodeGenerationRetryFail, "This tinyCode is already taken, please try again");
         }
 
-        TinyLink tinyLink = new TinyLink(tinyLinkGenerateRequestDTO.getTinyCode(), tinyLinkGenerateRequestDTO.getRedirectionLink(),
+        TinyLink tinyLink = new TinyLink(tinyCode, tinyLinkGenerateRequestDTO.getRedirectionLink(),
                 user, isCustom, BLANK, LinkStatus.ACTIVE);
         TinyLink savedTinyLink = tinyLinkRepository.save(tinyLink);
 
