@@ -12,11 +12,6 @@ public class StringConstants {
         private ApiPathConstant(){}
     }
 
-    public static class ConfigConstant{
-        public static final String API_URL = "app.url";
-        private ConfigConstant(){}
-    }
-
     public static class NumericConstant{
         public static final int INT_ZERO = 0;
     }

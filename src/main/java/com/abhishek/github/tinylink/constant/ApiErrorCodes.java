@@ -17,4 +17,6 @@ public class ApiErrorCodes {
 
     public static String tokenFetchFailed = "TL_0005";
 
+    public static String tinyCodeCountExceeded = "TL_0006";
+
 }

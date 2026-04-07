@@ -99,12 +99,21 @@ public class TinyLinkService {
             throw new TinyLinkException(ApiErrorCodes.tinyCodeGenerationRetryFail, "This tinyCode is already taken, please try again");
         }
 
+        // Check link limit for user
+        long currentLinkCount = tinyLinkRepository.countByUserId(user.getUserId());
+        int maxLinks = getMaxLinksForUserType(user.getUserType());
+        
+        if (currentLinkCount >= maxLinks) {
+            throw new TinyLinkException(ApiErrorCodes.tinyCodeCountExceeded,
+                "You have reached the maximum limit of " + maxLinks + " links");
+        }
+
         TinyLink tinyLink = new TinyLink(tinyCode, tinyLinkGenerateRequestDTO.getRedirectionLink(),
                 user, isCustom, BLANK, LinkStatus.ACTIVE);
         TinyLink savedTinyLink = tinyLinkRepository.save(tinyLink);
 
         return new TinyLinkResponseDTO(savedTinyLink.getTinyCode(), savedTinyLink.getRedirectionUrl(),
-                savedTinyLink.isCustom(), savedTinyLink.getCreatedAt());
+                savedTinyLink.isCustom(), savedTinyLink.getCreatedAt(), maxLinks - currentLinkCount);
     }
 
     User getUserViaAuthentication() throws Exception {
@@ -112,7 +121,7 @@ public class TinyLinkService {
         Optional<User> user = userRepository.findById(UUID.fromString(userId));
 
         if (user.isEmpty()) {
-            throw new Exception("User not found invalid UUID");
+            throw new TinyLinkException(ApiErrorCodes.userNotFound, "User not found");
         }
 
         return user.get();
@@ -137,7 +146,7 @@ public class TinyLinkService {
 
         return links.stream().map(item -> new TinyLinkResponseDTO(
                 item.getTinyCode(), item.getRedirectionUrl(),
-                item.isCustom(), item.getCreatedAt()
+                item.isCustom(), item.getCreatedAt(), null
         )).collect(Collectors.toList());
     }
 
@@ -181,5 +190,13 @@ public class TinyLinkService {
 
         return true;
 
+    }
+
+    private int getMaxLinksForUserType(User.UserType userType) {
+        return switch (userType) {
+            case BASE -> tinyLinkConfiguration.getBaseUserMaxLinks();
+            case SPECIAL -> tinyLinkConfiguration.getSpecialUserMaxLinks();
+            case CORPORATE -> tinyLinkConfiguration.getCorporateUserMaxLinks();
+        };
     }
 }

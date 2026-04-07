@@ -5,10 +5,8 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import static com.abhishek.github.tinylink.constant.StringConstants.ConfigConstant.API_URL;
-
 @Configuration
-@ConfigurationProperties(prefix = API_URL)
+@ConfigurationProperties(prefix = "app.url")
 @Getter
 @Setter
 public class TinyLinkConfiguration {
@@ -18,4 +16,10 @@ public class TinyLinkConfiguration {
      private String tinyLinkAllowedChars;
 
      private int shortCodeGenerationMaxRetryCount;
+
+     private int baseUserMaxLinks;
+
+     private int specialUserMaxLinks;
+
+     private int corporateUserMaxLinks;
 }
