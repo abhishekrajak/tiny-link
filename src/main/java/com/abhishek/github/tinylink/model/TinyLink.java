@@ -4,12 +4,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 
 @Entity
 @Table(name = "tiny_links")
 @Getter
-public class TinyLink {
+public class TinyLink implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
