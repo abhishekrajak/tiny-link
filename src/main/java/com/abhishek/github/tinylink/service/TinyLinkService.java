@@ -16,6 +16,7 @@ import com.abhishek.github.tinylink.util.UrlGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,8 @@ public class TinyLinkService {
     private final TinyLinkConfiguration tinyLinkConfiguration;
 
     @Transactional(readOnly = true)
-    public Optional<String> getRedirectionUrl(String tinyCode) {
+    @Cacheable(value = "redirectionUrls", key = "#tinyCode")
+    public String getRedirectionUrl(String tinyCode) {
         Optional<TinyLink> tinyLink = tinyLinkRepository.findByTinyCode(tinyCode);
 
         if (tinyLink.isEmpty()) {
@@ -48,7 +50,7 @@ public class TinyLinkService {
         }
 
         TinyLinkDTO tinyLinkDTO = new TinyLinkDTO(tinyLink.get());
-        return Optional.of(tinyLinkDTO.getRedirectionLink());
+        return tinyLinkDTO.getRedirectionLink();
     }
 
     @Transactional
@@ -102,10 +104,10 @@ public class TinyLinkService {
         // Check link limit for user
         long currentLinkCount = tinyLinkRepository.countByUserId(user.getUserId());
         int maxLinks = getMaxLinksForUserType(user.getUserType());
-        
+
         if (currentLinkCount >= maxLinks) {
             throw new TinyLinkException(ApiErrorCodes.tinyCodeCountExceeded,
-                "You have reached the maximum limit of " + maxLinks + " links");
+                    "You have reached the maximum limit of " + maxLinks + " links");
         }
 
         TinyLink tinyLink = new TinyLink(tinyCode, tinyLinkGenerateRequestDTO.getRedirectionLink(),
@@ -174,7 +176,7 @@ public class TinyLinkService {
     }
 
     @Transactional
-    public boolean updateTinyLinkStatus(TinyLinkStatusUpdateRequestDTO dto) throws Exception{
+    public boolean updateTinyLinkStatus(TinyLinkStatusUpdateRequestDTO dto) throws Exception {
 
         String userId = getUserIdFromToken();
 

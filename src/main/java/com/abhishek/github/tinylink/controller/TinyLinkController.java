@@ -43,13 +43,12 @@ public class TinyLinkController {
 
     @GetMapping(value = "/{tinyCode}")
     public ResponseEntity<String> getTinyLink(@PathVariable String tinyCode) {
-        Optional<String> url = tinyLinkService.getRedirectionUrl(tinyCode);
+        String url = tinyLinkService.getRedirectionUrl(tinyCode);
 
-        if (url.isEmpty()) return ResponseEntity.notFound().build();
+        if (url == null || url.isEmpty()) return ResponseEntity.notFound().build();
 
-        String urlValue = url.get();
         return ResponseEntity.status(HttpStatus.FOUND)
-                .header(HttpHeaders.LOCATION, urlValue)
+                .header(HttpHeaders.LOCATION, url)
                 .build();
     }
 
