@@ -46,7 +46,7 @@ public class TinyLinkService {
         Optional<TinyLink> tinyLink = tinyLinkRepository.findByTinyCode(tinyCode);
 
         if (tinyLink.isEmpty()) {
-            throw new TinyLinkException(tinyCodeNotFound, "Tiny Code is not created for this request.");
+            return BLANK;
         }
 
         TinyLinkDTO tinyLinkDTO = new TinyLinkDTO(tinyLink.get());
@@ -183,7 +183,7 @@ public class TinyLinkService {
         int updated = tinyLinkRepository.updateTinyLinkStatus(
                 UUID.fromString(userId),
                 dto.getTinyCode(),
-                dto.getStatus().name()
+                LinkStatus.INACTIVE.name()
         );
 
         if (updated == 0) {

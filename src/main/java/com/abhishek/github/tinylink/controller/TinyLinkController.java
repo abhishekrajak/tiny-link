@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,11 +42,15 @@ public class TinyLinkController {
         throw new Exception();
     }
 
-    @GetMapping(value = "/{tinyCode}")
+    @GetMapping(value = "/{tinyCode:[a-zA-Z0-9]{6,10}}")
     public ResponseEntity<String> getTinyLink(@PathVariable String tinyCode) {
         String url = tinyLinkService.getRedirectionUrl(tinyCode);
 
-        if (url == null || url.isEmpty()) return ResponseEntity.notFound().build();
+        if (url == null || url.isEmpty()) {
+            return ResponseEntity.status(302)
+                    .location(URI.create("/error/link-not-found.html"))
+                    .build();
+        }
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.LOCATION, url)
@@ -64,7 +69,7 @@ public class TinyLinkController {
         return new ApiResponse<>("XOXO", "NO DATA FOUND", null);
     }
 
-    @PatchMapping(value = "/api/v1/tiny-link/status")
+    @PatchMapping(value = "/api/v1/tiny-link/status/deactivate")
     public ApiResponse<?> updateTinyLinkStatus(
             @Valid @RequestBody
             TinyLinkStatusUpdateRequestDTO dto) throws Exception {
