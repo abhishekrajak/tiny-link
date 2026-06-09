@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.abhishek.github.tinylink.constant.ApiErrorCodes.tinyCodeNotFound;
 import static com.abhishek.github.tinylink.constant.StringConstants.BLANK;
 import static com.abhishek.github.tinylink.constant.StringConstants.NumericConstant.INT_ZERO;
 

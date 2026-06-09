@@ -1,8 +1,6 @@
 package com.abhishek.github.tinylink.dto;
 
-import com.abhishek.github.tinylink.model.LinkStatus;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
