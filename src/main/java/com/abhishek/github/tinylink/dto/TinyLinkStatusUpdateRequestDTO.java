@@ -11,7 +11,5 @@ import lombok.Data;
 public class TinyLinkStatusUpdateRequestDTO {
    @NotBlank(message = "Tiny code cannot be empty")
    private String tinyCode;
-   @NotNull(message = "Status cannot be null")
-   LinkStatus status;
 
 }
