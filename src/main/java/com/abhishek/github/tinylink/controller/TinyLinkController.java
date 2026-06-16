@@ -3,7 +3,9 @@ package com.abhishek.github.tinylink.controller;
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
 import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.*;
+import com.abhishek.github.tinylink.service.TinyLinkAnalyticsEventService;
 import com.abhishek.github.tinylink.service.TinyLinkService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +23,8 @@ import java.util.List;
 public class TinyLinkController {
 
     private final TinyLinkService tinyLinkService;
+
+    private final TinyLinkAnalyticsEventService tinyLinkAnalyticsEventService;
 
     @PostMapping(value = "/api/v1/tiny-link")
     public ApiResponse<?> addTinyLink(@RequestBody @Valid TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
@@ -42,14 +46,31 @@ public class TinyLinkController {
     }
 
     @GetMapping(value = "/{tinyCode:[a-zA-Z0-9]{6,10}}")
-    public ResponseEntity<String> getTinyLink(@PathVariable String tinyCode) {
+    public ResponseEntity<String> getTinyLink(@PathVariable String tinyCode,
+                                              HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
+
+        String userAgent = request.getHeader("User-Agent");
+        String referer = request.getHeader("Referer");
+
+        TinyLinkAnalyticsEventDTO eventDTO = new TinyLinkAnalyticsEventDTO(
+                tinyCode,
+                ipAddress,
+                userAgent,
+                referer
+        );
+
         String url = tinyLinkService.getRedirectionUrl(tinyCode);
 
         if (url == null || url.isEmpty()) {
+            tinyLinkAnalyticsEventService.saveEvent(eventDTO);
+
             return ResponseEntity.status(302)
                     .location(URI.create("/error/link-not-found.html"))
                     .build();
         }
+
+        tinyLinkAnalyticsEventService.saveEvent(eventDTO);
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.LOCATION, url)
