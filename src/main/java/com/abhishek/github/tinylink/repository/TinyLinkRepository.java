@@ -33,7 +33,7 @@ public interface TinyLinkRepository extends JpaRepository<TinyLink, Long> {
     @Query("SELECT COUNT(t) FROM TinyLink t WHERE t.user.userId = :userId")
     long countByUserId(@Param("userId") UUID userId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE tiny_links SET status = :status WHERE user_id = :userId AND tiny_code = :tinyCode", nativeQuery = true)
     int updateTinyLinkStatus(@Param("userId") UUID userId, @Param("tinyCode") String
                               tinyCode, @Param("status") String status);
