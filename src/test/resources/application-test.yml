@@ -1,0 +1,24 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client-id
+            client-secret: test-client-secret
+            scope: openid,profile,email
+
+jwt:
+  secret: testSecretKeyForTestingOnly1234567890
+  expiration: 3600000
+
+app:
+  url:
+    redirect-url: http://localhost:3000
+    tiny-url-code-length: 7
+    tiny-link-allowed-chars: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+    short-code-generation-max-retry-count: 5
+    base-url: http://localhost:3000
+    base-user-max-links: 50
+    special-user-max-links: 100
+    corporate-user-max-links: 1000
