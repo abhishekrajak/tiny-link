@@ -32,6 +32,7 @@ class TinyLinkApplicationTests {
     void contextLoads() {
         // This method doesn't need any code inside.
         // If the Spring context fails to start, this test will fail.
+        // TODO add few test cases later
     }
 
 }
