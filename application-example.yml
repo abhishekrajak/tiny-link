@@ -1,0 +1,116 @@
+spring:
+  application:
+    name: tiny-link
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tiny-link
+    username: myuser
+    password: mypassword
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      format_sql: true
+      jdbc:
+        time_zone: UTC
+
+    show-sql: true
+
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    locations: classpath:db/migration
+    url: jdbc:postgresql://localhost:5432/tiny-link
+    user: myuser
+    password: mypassword
+    schemas: public
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: example@example.com
+    password: xoxo xoxo xoxo
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: xoxo
+            client-secret: xoxo
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            scope:
+              - email
+              - profile
+              - openid
+
+
+  transaction:
+    default-timeout: 30
+    rollback-on-commit-failure: true
+
+app.url:
+  tiny-url-code-length: 7
+  tiny-link-allowed-chars: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+  short-code-generation-max-retry-count: 5
+  redirect-url: http://localhost:3000/auth.html
+  base-url: http://localhost:3000
+  base-user-max-links: 50
+  special-user-max-links: 100
+  corporate-user-max-links: 1000
+
+jwt:
+  secret: secret-key
+  expiration: 360000000
+
+debug: false
+#logging:
+#  level:
+#    org.springframework.security: warn
+#    org.hibernate.sql: warn
+#    org.hibernate.type.descriptor.sql.BasicBinder: warn
+#    root: warn
+#    com.abhishek.github.tinylink.filter: info
+#    org.springframework.web.filter.CommonsRequestLoggingFilter: debug
+
+logging:
+  level:
+    root: ERROR
+    org:
+      springframework:
+        web: ERROR
+        security: ERROR
+        cache: ERROR
+      hibernate: ERROR
+    com.abhishek.github.tinylink: ERROR
+  file:
+    name: logs/application.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+server:
+  port: 8080
+

@@ -5,12 +5,16 @@ TinyLink is a robust and scalable URL shortening service built with Spring Boot.
 ## Features
 
 - **URL Shortening**: Convert long URLs into short, shareable links
-- **Custom Short Codes**: Option to create custom short codes for URLs (for special users)
+- **Custom Short Codes**: Option to create custom short codes for URLs (available for SPECIAL users)
 - **User Authentication**: Secure OAuth 2.0 login with Google
 - **Multi-User Support**: Different user types with varying permissions
-- **Automatic Code Generation**: Generates random short codes when custom codes aren't provided
-- **Prefix Management**: Support for prefix-based URL routing
-- **RESTful API**: Easy integration with other services
+- **Automatic Code Generation**: Generates random short codes when custom codes aren't provided, ensuring no conflict with existing prefixes for BASE users.
+- **Prefix Management**: Support for prefix-based URL routing for SPECIAL users.
+- **Link Analytics**: Track link usage including IP address, user agent, and referrer.
+- **Link Deactivation**: Ability to deactivate existing short links.
+- **Error Redirection**: Custom error page for invalid or expired links.
+- **Caching**: In-memory caching for faster redirection lookup.
+- **RESTful API**: Easy integration with other services.
 
 ## Tech Stack
 
@@ -18,6 +22,7 @@ TinyLink is a robust and scalable URL shortening service built with Spring Boot.
 - **Framework**: Spring Boot 3.x
 - **Security**: Spring Security with JWT
 - **Database**: JPA with Hibernate
+- **Caching**: Spring Cache
 - **Build Tool**: Maven
 - **Testing**: JUnit 5, Mockito
 
@@ -65,12 +70,39 @@ Authorization: Bearer {jwt_token}
 ```http
 GET /{tinyCode}
 ```
+Redirects to the original long URL. If the tiny code is invalid or expired, it redirects to a custom error page (`/error/link-not-found.html`). This endpoint also logs analytics data for the redirection event.
+
+#### 4. Update TinyLink Redirection URL
+```http
+PATCH /api/v1/tiny-link/url
+Content-Type: application/json
+Authorization: Bearer {jwt_token}
+
+{
+  "tinyCode": "existingTinyCode",
+  "newRedirectionLink": "https://new-example.com/updated/url"
+}
+```
+Updates the redirection link for an existing tiny code.
+
+#### 5. Deactivate TinyLink
+```http
+PATCH /api/v1/tiny-link/status/deactivate
+Content-Type: application/json
+Authorization: Bearer {jwt_token}
+
+{
+  "tinyCode": "existingTinyCode",
+  "userId": "user-id"
+}
+```
+Deactivates an existing tiny link, making it no longer redirectable.
 
 ## User Types
 
 1. **BASE**: Can only use auto-generated short codes
 2. **SPECIAL**: Can use custom short codes with prefix validation
-3. **CORPORATE**: (Future implementation) Will have additional features
+3. **CORPORATE**: Planned for future enhancements, including advanced prefix management and other enterprise-level features.
 
 ## Getting Started
 
@@ -89,10 +121,9 @@ GET /{tinyCode}
    cd tiny-link
    ```
 
-2. Configure the application:
+2. Configure the application using your values:
    ```bash
-   cp src/main/resources/application-example.yml src/main/resources/application.yml
-   # Update application.yml with your database and OAuth credentials
+   cp application-example.yml application-dev.yml 
    ```
 
 3. Build and run the application:
