@@ -5,6 +5,11 @@ import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.*;
 import com.abhishek.github.tinylink.service.TinyLinkAnalyticsEventService;
 import com.abhishek.github.tinylink.service.TinyLinkService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -20,12 +25,29 @@ import java.util.List;
 @RestController
 @Validated
 @AllArgsConstructor
+@Tag(name = "Tiny Link", description = "Endpoints for creating, updating, managing, and redirecting tiny links")
 public class TinyLinkController {
 
     private final TinyLinkService tinyLinkService;
 
     private final TinyLinkAnalyticsEventService tinyLinkAnalyticsEventService;
 
+    @Operation(
+            summary = "Create a new tiny link",
+            description = "Generates a short, unique code for the provided destination URL."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Tiny link created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TinyLinkResponseDTO.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request payload",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
     @PostMapping(value = "/api/v1/tiny-link")
     public ApiResponse<?> addTinyLink(@RequestBody @Valid TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
         TinyLinkResponseDTO savedTinyLink = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
@@ -36,6 +58,22 @@ public class TinyLinkController {
         }
     }
 
+    @Operation(
+            summary = "Update destination URL",
+            description = "Updates the destination URL associated with an existing tiny link."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Tiny link URL updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request payload",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
     @PatchMapping(value = "/api/v1/tiny-link/url")
     public ApiResponse<?> updateTinyLink(@RequestBody @Valid TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
         boolean isSuccess = tinyLinkService.updateTinyLink(tinyLinkUpdateRequestDTO);
@@ -45,9 +83,21 @@ public class TinyLinkController {
         throw new Exception();
     }
 
+    @Operation(
+            summary = "Redirect to target URL",
+            description = "Redirects to the original URL mapped to the provided short code, or to the error page if not found."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "302",
+                    description = "Redirection successful"
+            )
+    })
     @GetMapping(value = "/{tinyCode:[a-zA-Z0-9]{6,10}}")
-    public ResponseEntity<String> getTinyLink(@PathVariable String tinyCode,
-                                              HttpServletRequest request) {
+    public ResponseEntity<String> getTinyLink(
+            @Parameter(description = "The short code of the link to retrieve", required = true, example = "abcdef")
+            @PathVariable String tinyCode,
+            HttpServletRequest request) {
         String ipAddress = request.getRemoteAddr();
 
         String userAgent = request.getHeader("User-Agent");
@@ -77,6 +127,17 @@ public class TinyLinkController {
                 .build();
     }
 
+    @Operation(
+            summary = "Retrieve all tiny links",
+            description = "Retrieves a list of all tiny links stored in the system."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved all tiny links",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
     @GetMapping(value = "/api/v1/links")
     public ApiResponse<?> getTinyLinkTest() {
         try {
@@ -89,6 +150,22 @@ public class TinyLinkController {
         return new ApiResponse<>("XOXO", "NO DATA FOUND", null);
     }
 
+    @Operation(
+            summary = "Deactivate tiny link status",
+            description = "Deactivates the status of an existing tiny link using the provided request details."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Tiny link status updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request payload",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
     @PatchMapping(value = "/api/v1/tiny-link/status/deactivate")
     public ApiResponse<?> updateTinyLinkStatus(
             @Valid @RequestBody
