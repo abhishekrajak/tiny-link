@@ -1,11 +1,10 @@
 package com.abhishek.github.tinylink.config;
 
 import com.abhishek.github.tinylink.filter.JwtAuthenticationFilter;
-import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.service.CustomOAuth2OidcUserService;
 import com.abhishek.github.tinylink.util.JwtTokenUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -32,8 +31,7 @@ public class SecurityConfig {
     private String frontEndBaseUrl;
 
     @Autowired
-    SecurityConfig(UserRepository userRepository, ObjectMapper objectMapper,
-                   CustomOAuth2OidcUserService customOAuth2OidcUserService,
+    SecurityConfig(CustomOAuth2OidcUserService customOAuth2OidcUserService,
                    JwtTokenUtil jwtTokenUtil) {
         this.customOAuth2OidcUserService = customOAuth2OidcUserService;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -43,7 +41,7 @@ public class SecurityConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(frontEndBaseUrl) // Flutter web origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
