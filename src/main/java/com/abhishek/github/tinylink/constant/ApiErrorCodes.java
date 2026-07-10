@@ -19,4 +19,10 @@ public class ApiErrorCodes {
 
     public static String tinyCodeCountExceeded = "TL_0006";
 
+    public static final String SELF_REFERENCING_URL = "TL_0007";
+
+    public static final String INTERNAL_URL_FORBIDDEN = "TL_0008";
+
+    public static final String INVALID_URL = "TL_0009";
+
 }

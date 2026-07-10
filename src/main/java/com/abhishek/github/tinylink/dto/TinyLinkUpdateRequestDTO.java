@@ -15,6 +15,7 @@ public class TinyLinkUpdateRequestDTO {
 
    @NotBlank(message = "Redirection URL cannot be empty")
    @Schema(description = "The new destination URL where the tiny link should redirect to", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.github.com")
+   @NotBlank(message = "Redirection link is required")
    private String redirectionLink;
 
 }
