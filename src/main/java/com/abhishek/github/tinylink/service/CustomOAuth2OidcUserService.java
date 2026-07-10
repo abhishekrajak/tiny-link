@@ -12,13 +12,13 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class CustomOAuth2OidcUserService extends OidcUserService {
+    private final UserService userService;
     private final UserRepository userRepository;
     private final AuthProviderRepository authProviderRepository;
 
@@ -54,22 +54,10 @@ public class CustomOAuth2OidcUserService extends OidcUserService {
             });
         }
 
-        User user = userOptional.orElseGet(() -> {
-            User newUser = new User();
-
-            newUser.setEmailId(email);
-            newUser.setName(name);
-            newUser.setUsername(email);
-            newUser.setPassword("");
-            newUser.setRegistrationCompleted(isEmailVerified);
-            newUser.setRoles(Set.of(User.UserRole.ROLE_USER));
-            newUser.setUserType(User.UserType.BASE);
-            newUser.setCreatedAt(Instant.now());
-            newUser.addAuthProvider(provider, providerUserId);
-
-            userRepository.save(newUser);
-            return newUser;
-        });
+        User user = userOptional.orElseGet(() -> userService.createAndSaveUser(
+                email, name, isEmailVerified, provider, providerUserId,
+                "", User.UserRole.ROLE_USER, User.UserType.BASE
+        ));
 
         return new CustomOidcUser(oidcUser, user);
     }

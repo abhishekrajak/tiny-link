@@ -28,7 +28,16 @@ public class UserService {
 
         String emailId = String.format("%s@armatrix.dev", userName);
 
-        User newUser = new User();
+        User newUser = generateUserBasisParams(
+                emailId,
+                userName,
+                false,
+                AuthProviderEntity.AuthProvider.DEMO,
+                userName,
+                "",
+                User.UserRole.ROLE_USER,
+                User.UserType.BASE
+        );
 
         newUser.setEmailId(emailId);
         newUser.setName(userName);
@@ -49,6 +58,43 @@ public class UserService {
                         .toList());
 
         return new TinyLinkUserDTO(createdUser.getEmailId(), jwtToken);
+    }
+
+    @Transactional
+    public User createAndSaveUser(String email, String name, boolean isEmailVerified,
+                                  AuthProviderEntity.AuthProvider
+                                  provider, String providerUserId,
+                                  String password, User.UserRole userRole,
+                                  User.UserType userType) {
+
+        User newUser = generateUserBasisParams(
+                email, name,
+                isEmailVerified, provider, providerUserId,
+                password, userRole, userType
+        );
+
+        return userRepository.save(newUser);
+    }
+
+    User generateUserBasisParams(String email, String name, boolean isEmailVerified,
+                                 AuthProviderEntity.AuthProvider
+                                         provider, String providerUserId,
+                                 String password, User.UserRole userRole,
+                                 User.UserType userType) {
+
+        User user = new User();
+
+        user.setEmailId(email);
+        user.setName(name);
+        user.setUsername(email);
+        user.setPassword("");
+        user.setRegistrationCompleted(isEmailVerified);
+        user.setRoles(Set.of(userRole));
+        user.setUserType(userType);
+        user.setCreatedAt(Instant.now());
+        user.addAuthProvider(provider, providerUserId);
+
+        return user;
     }
 
 }
