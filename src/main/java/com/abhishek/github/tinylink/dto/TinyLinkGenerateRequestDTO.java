@@ -1,6 +1,7 @@
 package com.abhishek.github.tinylink.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ public class TinyLinkGenerateRequestDTO {
    private String tinyCode;
 
    @Schema(description = "The target destination URL where the tiny link should redirect to", requiredMode = Schema.RequiredMode.REQUIRED, example = "https://www.google.com")
+   @NotBlank(message = "Redirection link is required")
    private String redirectionLink;
 
 }

@@ -13,6 +13,7 @@ import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.TinyLinkRepository;
 import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.util.UrlGenerator;
+import com.abhishek.github.tinylink.util.UrlSecurityValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +40,8 @@ public class TinyLinkService {
 
     private final TinyLinkConfiguration tinyLinkConfiguration;
 
+    private final UrlSecurityValidator urlSecurityValidator;
+
     @Transactional(readOnly = true)
     @Cacheable(value = "redirectionUrls", key = "#tinyCode")
     public String getRedirectionUrl(String tinyCode) {
@@ -54,6 +57,8 @@ public class TinyLinkService {
 
     @Transactional
     public TinyLinkResponseDTO insertTinyLink(TinyLinkGenerateRequestDTO tinyLinkGenerateRequestDTO) throws Exception {
+        urlSecurityValidator.validate(tinyLinkGenerateRequestDTO.getRedirectionLink());
+
         User user = getUserViaAuthentication();
 
         String tinyCode = Optional.ofNullable(tinyLinkGenerateRequestDTO.getTinyCode()).orElse(BLANK);
@@ -154,8 +159,9 @@ public class TinyLinkService {
     }
 
     public boolean updateTinyLink(TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
-        String userId = getUserIdFromToken();
+        urlSecurityValidator.validate(tinyLinkUpdateRequestDTO.getRedirectionLink());
 
+        String userId = getUserIdFromToken();
 
         Optional<TinyLink> tinyLink =
                 tinyLinkRepository.findByTinyCode(tinyLinkUpdateRequestDTO.getTinyCode());
