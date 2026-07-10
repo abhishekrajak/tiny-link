@@ -9,12 +9,14 @@ import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.TinyLinkRepository;
 import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.util.UrlGenerator;
+import com.abhishek.github.tinylink.util.UrlSecurityValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,8 +39,9 @@ class TinyLinkServiceTest {
     @Spy
     TinyLinkConfiguration tinyLinkConfiguration;
 
-    @InjectMocks
     TinyLinkService tinyLinkService;
+
+    UrlSecurityValidator urlSecurityValidator;
 
 
     @BeforeEach
@@ -49,6 +52,16 @@ class TinyLinkServiceTest {
         this.tinyLinkConfiguration.setBaseUserMaxLinks(100);
         this.tinyLinkConfiguration.setSpecialUserMaxLinks(200);
         this.tinyLinkConfiguration.setCorporateUserMaxLinks(300);
+        this.tinyLinkConfiguration.setApiBaseUrl("http://localhost:8080");
+
+        this.urlSecurityValidator = new UrlSecurityValidator(tinyLinkConfiguration);
+
+        this.tinyLinkService = new TinyLinkService(
+                tinyLinkRepository,
+                userRepository,
+                tinyLinkConfiguration,
+                urlSecurityValidator
+        );
     }
 
 
