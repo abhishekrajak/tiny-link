@@ -86,6 +86,7 @@ app.config:
 jwt:
   secret: secret-key
   expiration: 360000000
+  issuer: ${API_BASE_URL}
 
 debug: false
 #logging:

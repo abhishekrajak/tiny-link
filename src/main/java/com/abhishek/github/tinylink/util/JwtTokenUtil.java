@@ -23,6 +23,9 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Value("${jwt.issuer}")
+    private String issuer;
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
@@ -35,7 +38,7 @@ public class JwtTokenUtil {
                 .subject(user.getUserId().toString())
                 .claim("emailId", user.getEmailId())
                 .claim("roles", user.getRoles())
-                .issuer("www.tinylink.com")
+                .issuer(issuer)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
@@ -47,12 +50,12 @@ public class JwtTokenUtil {
         Date expiryDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
-                .subject(userId)  // Using user ID as subject
-                .claim("userId", userId)  // Also include as claim for easy access
+                .subject(userId)
+                .claim("userId", userId)
                 .claim("email", email)
                 .claim("name", name)
                 .claim("roles", roles)
-                .issuer("www.tinylink.com")
+                .issuer(issuer)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
