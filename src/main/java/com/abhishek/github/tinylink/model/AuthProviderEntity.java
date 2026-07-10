@@ -42,6 +42,7 @@ public class AuthProviderEntity {
     }
 
     public enum AuthProvider {
-        GOOGLE
+        GOOGLE,
+        DEMO
     }
 }
