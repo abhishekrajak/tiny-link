@@ -28,7 +28,7 @@ public class SecurityConfig {
     private final CustomOAuth2OidcUserService customOAuth2OidcUserService;
     private final JwtTokenUtil jwtTokenUtil;
 
-    @Value("${app.url.base-url}")
+    @Value("${app.config.base-url}")
     private String frontEndBaseUrl;
 
     @Autowired

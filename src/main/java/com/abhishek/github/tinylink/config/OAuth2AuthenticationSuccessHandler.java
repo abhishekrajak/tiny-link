@@ -21,7 +21,7 @@ import java.util.*;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtTokenUtil jwtTokenUtil;
-    @Value("${app.url.redirect-url}")
+    @Value("${app.config.redirect-url}")
     private String frontendUrl;
 
     @Override

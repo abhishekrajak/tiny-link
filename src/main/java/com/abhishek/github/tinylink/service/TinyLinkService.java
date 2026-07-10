@@ -114,7 +114,8 @@ public class TinyLinkService {
         TinyLink savedTinyLink = tinyLinkRepository.save(tinyLink);
 
         return new TinyLinkResponseDTO(savedTinyLink.getTinyCode(), savedTinyLink.getRedirectionUrl(),
-                savedTinyLink.isCustom(), savedTinyLink.getCreatedAt(), maxLinks - currentLinkCount);
+                savedTinyLink.isCustom(), savedTinyLink.getCreatedAt(), maxLinks - currentLinkCount,
+                String.format("%s/%s", tinyLinkConfiguration.getApiBaseUrl(), savedTinyLink.getTinyCode()));
     }
 
     User getUserViaAuthentication() throws Exception {
@@ -147,7 +148,8 @@ public class TinyLinkService {
 
         return links.stream().map(item -> new TinyLinkResponseDTO(
                 item.getTinyCode(), item.getRedirectionUrl(),
-                item.isCustom(), item.getCreatedAt(), null
+                item.isCustom(), item.getCreatedAt(), null,
+                String.format("%s/%s", tinyLinkConfiguration.getApiBaseUrl(), item.getTinyCode())
         )).collect(Collectors.toList());
     }
 

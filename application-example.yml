@@ -1,3 +1,5 @@
+API_BASE_URL: http://localhost:8080
+
 spring:
   application:
     name: tiny-link
@@ -64,7 +66,13 @@ spring:
     default-timeout: 30
     rollback-on-commit-failure: true
 
-app.url:
+springdoc:
+  openapi:
+    servers:
+      - url: ${API_BASE_URL}
+        description: Dynamic Server
+
+app.config:
   tiny-url-code-length: 7
   tiny-link-allowed-chars: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
   short-code-generation-max-retry-count: 5
@@ -73,6 +81,7 @@ app.url:
   base-user-max-links: 50
   special-user-max-links: 100
   corporate-user-max-links: 1000
+  api-base-url: ${API_BASE_URL}
 
 jwt:
   secret: secret-key
