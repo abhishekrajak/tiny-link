@@ -1,3 +1,5 @@
+API_BASE_URL: http://localhost:8080
+
 spring:
   security:
     oauth2:
@@ -13,7 +15,7 @@ jwt:
   expiration: 3600000
 
 app:
-  url:
+  config:
     redirect-url: http://localhost:3000
     tiny-url-code-length: 7
     tiny-link-allowed-chars: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
@@ -22,3 +24,4 @@ app:
     base-user-max-links: 50
     special-user-max-links: 100
     corporate-user-max-links: 1000
+    api-base-url: ${API_BASE_URL}
