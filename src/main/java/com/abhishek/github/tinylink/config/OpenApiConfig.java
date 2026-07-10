@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -18,13 +17,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 description = "Open API Specification for Tiny Link API",
                 title = "Open API Specification - Tiny Link API",
                 version = "1.0"
-        ),
-        servers = {
-                @Server(
-                        description = "Local ENV",
-                        url = "http://localhost:8080"
-                )
-        }
+        )
 )
 @SecurityScheme(
         name = "BearerAuth",

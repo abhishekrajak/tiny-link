@@ -90,7 +90,7 @@ class TinyLinkControllerTest {
                 );
 
         TinyLinkResponseDTO tinyLinkResponseDTO = new TinyLinkResponseDTO("ABHI1331", "https://www.twitter.com",
-                true, Instant.now(), 99L);
+                true, Instant.now(), 99L, "http://localhost:8080/ABHI1331");
 
         when(tinyLinkService.insertTinyLink(tinyLinkGenerateRequestDTO)).thenReturn(
             tinyLinkResponseDTO

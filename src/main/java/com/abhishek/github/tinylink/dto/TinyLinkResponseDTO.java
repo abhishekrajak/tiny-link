@@ -29,4 +29,7 @@ public class TinyLinkResponseDTO {
     @Schema(description = "The remaining limit/count of times this link can be visited/used", example = "1000")
     private Long linkCountRemaining;
 
+    @Schema(description = "The url with tinycode that you can share directly")
+    private String tinyLink;
+
 }

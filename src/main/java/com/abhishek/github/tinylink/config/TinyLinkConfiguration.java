@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "app.url")
+@ConfigurationProperties(prefix = "app.config")
 @Getter
 @Setter
 public class TinyLinkConfiguration {
@@ -22,4 +22,6 @@ public class TinyLinkConfiguration {
      private int specialUserMaxLinks;
 
      private int corporateUserMaxLinks;
+
+     private String apiBaseUrl;
 }
