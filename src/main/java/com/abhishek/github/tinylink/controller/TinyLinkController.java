@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,7 +26,7 @@ import java.util.List;
 @RestController
 @Validated
 @AllArgsConstructor
-@Tag(name = "Tiny Link", description = "Endpoints for creating, updating, managing, and redirecting tiny links")
+@Tag(name = "Tiny Link Controller", description = "Endpoints for creating, updating, managing, and redirecting tiny links")
 public class TinyLinkController {
 
     private final TinyLinkService tinyLinkService;
@@ -48,6 +49,7 @@ public class TinyLinkController {
                     content = @Content(mediaType = "application/json")
             )
     })
+    @SecurityRequirement(name = "BearerAuth")
     @PostMapping(value = "/api/v1/tiny-link")
     public ApiResponse<?> addTinyLink(@RequestBody @Valid TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
         TinyLinkResponseDTO savedTinyLink = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
@@ -74,6 +76,7 @@ public class TinyLinkController {
                     content = @Content(mediaType = "application/json")
             )
     })
+    @SecurityRequirement(name = "BearerAuth")
     @PatchMapping(value = "/api/v1/tiny-link/url")
     public ApiResponse<?> updateTinyLink(@RequestBody @Valid TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
         boolean isSuccess = tinyLinkService.updateTinyLink(tinyLinkUpdateRequestDTO);
@@ -138,6 +141,7 @@ public class TinyLinkController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class))
             )
     })
+    @SecurityRequirement(name = "BearerAuth")
     @GetMapping(value = "/api/v1/links")
     public ApiResponse<?> getTinyLinkTest() {
         try {
@@ -166,6 +170,7 @@ public class TinyLinkController {
                     content = @Content(mediaType = "application/json")
             )
     })
+    @SecurityRequirement(name = "BearerAuth")
     @PatchMapping(value = "/api/v1/tiny-link/status/deactivate")
     public ApiResponse<?> updateTinyLinkStatus(
             @Valid @RequestBody
