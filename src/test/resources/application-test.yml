@@ -19,6 +19,8 @@ app:
   config:
     redirect-url: http://localhost:3000
     tiny-url-code-length: 7
+    tiny-url-code-min-length: 7
+    tiny-url-code-max-length: 20
     tiny-link-allowed-chars: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
     short-code-generation-max-retry-count: 5
     base-url: http://localhost:3000

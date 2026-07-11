@@ -1,5 +1,6 @@
 package com.abhishek.github.tinylink.controller;
 
+import com.abhishek.github.tinylink.config.TinyLinkConfiguration;
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
 import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.ApiResponse;
@@ -9,6 +10,7 @@ import com.abhishek.github.tinylink.service.TinyLinkAnalyticsEventService;
 import com.abhishek.github.tinylink.service.TinyLinkService;
 import com.abhishek.github.tinylink.util.JwtTokenUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +54,17 @@ class TinyLinkControllerTest {
     @MockitoBean
     private JwtTokenUtil jwtTokenUtil;
 
+    @MockitoBean
+    private TinyLinkConfiguration tinyLinkConfiguration;
+
     @Autowired
     ObjectMapper objectMapper;
+
+    @BeforeEach()
+    public void setUp() {
+        when(tinyLinkConfiguration.getTinyUrlCodeMinLength()).thenReturn(7);
+        when(tinyLinkConfiguration.getTinyUrlCodeMaxLength()).thenReturn(20);
+    }
 
     @Test()
     @DisplayName("When redirection url is not present then redirect to error page")
