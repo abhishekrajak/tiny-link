@@ -25,4 +25,6 @@ public class ApiErrorCodes {
 
     public static final String INVALID_URL = "TL_0009";
 
+    public static final String INVALID_TINY_CODE = "TL_0010";
+
 }

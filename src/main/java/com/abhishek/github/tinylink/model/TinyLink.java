@@ -1,7 +1,7 @@
 package com.abhishek.github.tinylink.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 import java.io.Serial;
@@ -20,7 +20,7 @@ public class TinyLink implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Size(min = 7, max = 20, message = "Tiny code must be between 7 and 20 characters")
+    @NotBlank
     @Column(nullable = false, length = 20, unique = true)
     private String tinyCode;
 

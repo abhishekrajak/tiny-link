@@ -8,6 +8,7 @@ import com.abhishek.github.tinylink.model.TinyLink;
 import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.TinyLinkRepository;
 import com.abhishek.github.tinylink.repository.UserRepository;
+import com.abhishek.github.tinylink.util.TinyCodeValidatorUtil;
 import com.abhishek.github.tinylink.util.UrlGenerator;
 import com.abhishek.github.tinylink.util.UrlSecurityValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +43,8 @@ class TinyLinkServiceTest {
 
     UrlSecurityValidator urlSecurityValidator;
 
+    TinyCodeValidatorUtil tinyCodeValidatorUtil;
+
 
     @BeforeEach
     void setup() {
@@ -53,14 +55,19 @@ class TinyLinkServiceTest {
         this.tinyLinkConfiguration.setSpecialUserMaxLinks(200);
         this.tinyLinkConfiguration.setCorporateUserMaxLinks(300);
         this.tinyLinkConfiguration.setApiBaseUrl("http://localhost:8080");
+        this.tinyLinkConfiguration.setTinyUrlCodeMinLength(7);
+        this.tinyLinkConfiguration.setTinyUrlCodeMaxLength(20);
 
         this.urlSecurityValidator = new UrlSecurityValidator(tinyLinkConfiguration);
+
+        this.tinyCodeValidatorUtil = new TinyCodeValidatorUtil(tinyLinkConfiguration);
 
         this.tinyLinkService = new TinyLinkService(
                 tinyLinkRepository,
                 userRepository,
                 tinyLinkConfiguration,
-                urlSecurityValidator
+                urlSecurityValidator,
+                tinyCodeValidatorUtil
         );
     }
 
@@ -138,7 +145,6 @@ class TinyLinkServiceTest {
 
             TinyLinkGenerateRequestDTO req = new TinyLinkGenerateRequestDTO(tinyCodeGenerated, "https://example.com");
 
-            when(tinyLinkRepository.findFirstMatchingPrefix(tinyCodeGenerated)).thenReturn(Optional.empty());
             when(tinyLinkRepository.existsTinyLinkByTinyCode(tinyCodeGenerated)).thenReturn(false);
             when(tinyLinkRepository.countByUserId(user.getUserId())).thenReturn(0L);
 
