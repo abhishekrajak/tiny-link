@@ -98,7 +98,7 @@ public class TinyLinkController {
     })
     @GetMapping(value = "/{tinyCode:[a-zA-Z0-9]{6,10}}")
     public ResponseEntity<String> getTinyLink(
-            @Parameter(description = "The short code of the link to retrieve", required = true, example = "abcdef")
+            @Parameter(description = "The short code of the link to retrieve", required = true, example = "ABHI1331")
             @PathVariable String tinyCode,
             HttpServletRequest request) {
         String ipAddress = request.getRemoteAddr();
@@ -128,6 +128,21 @@ public class TinyLinkController {
         return ResponseEntity.status(HttpStatus.FOUND)
                 .header(HttpHeaders.LOCATION, url)
                 .build();
+    }
+
+    @GetMapping(value = "/demo/{tinyCode:[a-zA-Z0-9]{6,10}}")
+    public ApiResponse<?> getTinyLinkForDemo(
+            @Parameter(description = "The short code of the link to retrieve", required = true, example = "ABHI1331")
+            @PathVariable String tinyCode) {
+
+        String url = tinyLinkService.getRedirectionUrl(tinyCode);
+
+        if (url == null || url.isEmpty()) {
+            return new ApiResponse<>(ApiErrorCodes.INVALID_TINY_CODE, "No URL with this tinyCode", null);
+        } else {
+            return ApiResponse.success(url);
+        }
+
     }
 
     @Operation(
