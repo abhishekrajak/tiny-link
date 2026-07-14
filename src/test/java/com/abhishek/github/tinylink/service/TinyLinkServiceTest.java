@@ -45,6 +45,8 @@ class TinyLinkServiceTest {
 
     TinyCodeValidatorUtil tinyCodeValidatorUtil;
 
+    UserContextService userContextService;
+
 
     @BeforeEach
     void setup() {
@@ -62,12 +64,15 @@ class TinyLinkServiceTest {
 
         this.tinyCodeValidatorUtil = new TinyCodeValidatorUtil(tinyLinkConfiguration);
 
+        this.userContextService = new UserContextService();
+
         this.tinyLinkService = new TinyLinkService(
                 tinyLinkRepository,
                 userRepository,
                 tinyLinkConfiguration,
                 urlSecurityValidator,
-                tinyCodeValidatorUtil
+                tinyCodeValidatorUtil,
+                userContextService
         );
     }
 

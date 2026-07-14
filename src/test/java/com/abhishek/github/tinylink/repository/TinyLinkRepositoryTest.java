@@ -69,7 +69,7 @@ public class TinyLinkRepositoryTest {
         assertThat(found).isPresent();
         assertThat(found.get().getTinyCode()).isEqualTo("ABC12345");
 
-        List<TinyLink> byUser = tinyLinkRepository.findByUserId(user.getUserId(), LinkStatus.ACTIVE.name());
+        List<TinyLink> byUser = tinyLinkRepository.findByUserId(user.getUserId(), LinkStatus.ACTIVE);
         assertThat(byUser).hasSize(1);
 
         long count = tinyLinkRepository.countByUserId(user.getUserId());
@@ -88,6 +88,7 @@ public class TinyLinkRepositoryTest {
         user.setPassword("secret");
         user.setCreatedAt(Instant.now());
         user.setUserType(User.UserType.BASE);
+        user.setUserStatus(UserStatus.ACTIVE);
         user = userRepository.save(user);
 
         TinyLink tinyLink = new TinyLink(
