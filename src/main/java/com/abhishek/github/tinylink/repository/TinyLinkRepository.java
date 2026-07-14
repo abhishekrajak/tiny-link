@@ -27,8 +27,8 @@ public interface TinyLinkRepository extends JpaRepository<TinyLink, Long> {
 
     boolean existsTinyLinkByTinyCode(String tinyCode);
 
-    @Query("SELECT t from TinyLink t where t.user.userId = :userId")
-    List<TinyLink> findByUserId(@Param("userId") UUID userId);
+    @Query("SELECT t from TinyLink t where t.user.userId = :userId and t.status = :status")
+    List<TinyLink> findByUserId(@Param("userId") UUID userId, @Param("status") String status);
 
     @Query("SELECT COUNT(t) FROM TinyLink t WHERE t.user.userId = :userId")
     long countByUserId(@Param("userId") UUID userId);
@@ -37,4 +37,8 @@ public interface TinyLinkRepository extends JpaRepository<TinyLink, Long> {
     @Query(value = "UPDATE tiny_links SET status = :status WHERE user_id = :userId AND tiny_code = :tinyCode", nativeQuery = true)
     int updateTinyLinkStatus(@Param("userId") UUID userId, @Param("tinyCode") String
                               tinyCode, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "UPDATE tiny_links SET status = :status WHERE user_id = :userId", nativeQuery = true)
+    int updateAllTinyLinkStatusForAUser(@Param("userId") UUID userId, @Param("status") String status);
 }

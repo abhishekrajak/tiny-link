@@ -5,8 +5,10 @@ import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.ApiResponse;
 import com.abhishek.github.tinylink.dto.TinyLinkUserDTO;
 import com.abhishek.github.tinylink.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +27,18 @@ public class UserController {
 
         if (newDemoUser != null){
             return ApiResponse.success(newDemoUser);
+        } else {
+            return new ApiResponse<>(ApiErrorCodes.unknownErrorCode, ApiErrorMessages.unknownErrorMessage, null);
+        }
+    }
+
+    @SecurityRequirement(name = "BearerAuth")
+    @DeleteMapping
+    public ApiResponse<?> deleteUser() throws Exception {
+        boolean result = userService.deleteUser();
+
+        if (result){
+            return ApiResponse.success(null);
         } else {
             return new ApiResponse<>(ApiErrorCodes.unknownErrorCode, ApiErrorMessages.unknownErrorMessage, null);
         }

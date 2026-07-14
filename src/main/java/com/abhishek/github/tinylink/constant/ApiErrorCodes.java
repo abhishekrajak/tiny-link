@@ -27,4 +27,6 @@ public class ApiErrorCodes {
 
     public static final String INVALID_TINY_CODE = "TL_0010";
 
+    public static final String TINY_LINK_NOT_FOUND = "TL_0011";
+
 }

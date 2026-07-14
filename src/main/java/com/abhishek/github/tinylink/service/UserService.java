@@ -2,7 +2,9 @@ package com.abhishek.github.tinylink.service;
 
 import com.abhishek.github.tinylink.dto.TinyLinkUserDTO;
 import com.abhishek.github.tinylink.model.AuthProviderEntity;
+import com.abhishek.github.tinylink.model.LinkStatus;
 import com.abhishek.github.tinylink.model.User;
+import com.abhishek.github.tinylink.model.UserStatus;
 import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.util.DemoUserGenerator;
 import com.abhishek.github.tinylink.util.JwtTokenUtil;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,10 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final JwtTokenUtil jwtTokenUtil;
+
+    private final TinyLinkService tinyLinkService;
+
+    private final UserContextService userContextService;
 
     @Transactional
     public TinyLinkUserDTO createAndSaveDemoUser() {
@@ -91,10 +98,21 @@ public class UserService {
         user.setRegistrationCompleted(isEmailVerified);
         user.setRoles(Set.of(userRole));
         user.setUserType(userType);
+        user.setUserStatus(UserStatus.ACTIVE);
         user.setCreatedAt(Instant.now());
         user.addAuthProvider(provider, providerUserId);
 
         return user;
+    }
+
+    @Transactional
+    public boolean deleteUser() throws Exception {
+        String userId = userContextService.getUserIdFromToken();
+        UUID userUuId = UUID.fromString(userId);
+
+        int userUpdated = userRepository.updateUser(userUuId, UserStatus.DELETED.name());
+        int linksDisabled = tinyLinkService.disableAllLinksForAUser(userUuId, LinkStatus.USER_IS_DELETED.name());
+        return true;
     }
 
 }
