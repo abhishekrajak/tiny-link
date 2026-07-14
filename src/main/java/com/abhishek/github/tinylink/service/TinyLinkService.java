@@ -115,7 +115,7 @@ public class TinyLinkService {
         String userId = userContextService.getUserIdFromToken();
 
         List<TinyLink> links =
-                tinyLinkRepository.findByUserId(UUID.fromString(userId), LinkStatus.ACTIVE.name());
+                tinyLinkRepository.findByUserId(UUID.fromString(userId), LinkStatus.ACTIVE);
 
         return links.stream().map(item -> new TinyLinkResponseDTO(
                 item.getTinyCode(), item.getRedirectionUrl(),

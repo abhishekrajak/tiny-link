@@ -1,5 +1,6 @@
 package com.abhishek.github.tinylink.repository;
 
+import com.abhishek.github.tinylink.model.LinkStatus;
 import com.abhishek.github.tinylink.model.Prefix;
 import com.abhishek.github.tinylink.model.TinyLink;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,7 +29,7 @@ public interface TinyLinkRepository extends JpaRepository<TinyLink, Long> {
     boolean existsTinyLinkByTinyCode(String tinyCode);
 
     @Query("SELECT t from TinyLink t where t.user.userId = :userId and t.status = :status")
-    List<TinyLink> findByUserId(@Param("userId") UUID userId, @Param("status") String status);
+    List<TinyLink> findByUserId(@Param("userId") UUID userId, @Param("status") LinkStatus status);
 
     @Query("SELECT COUNT(t) FROM TinyLink t WHERE t.user.userId = :userId")
     long countByUserId(@Param("userId") UUID userId);
