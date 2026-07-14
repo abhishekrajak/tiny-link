@@ -13,6 +13,7 @@ import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.util.TinyCodeValidatorUtil;
 import com.abhishek.github.tinylink.util.UrlGenerator;
 import com.abhishek.github.tinylink.util.UrlSecurityValidator;
+import io.opencensus.trace.Link;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +42,8 @@ public class TinyLinkService {
     private final UrlSecurityValidator urlSecurityValidator;
 
     private final TinyCodeValidatorUtil tinyCodeValidatorUtil;
+
+    private final UserContextService userContextService;
 
     @Transactional(readOnly = true)
     @Cacheable(value = "redirectionUrls", key = "#tinyCode")
@@ -96,7 +99,7 @@ public class TinyLinkService {
     }
 
     User getUserViaAuthentication() throws Exception {
-        String userId = getUserIdFromToken();
+        String userId = userContextService.getUserIdFromToken();
         Optional<User> user = userRepository.findById(UUID.fromString(userId));
 
         if (user.isEmpty()) {
@@ -106,22 +109,13 @@ public class TinyLinkService {
         return user.get();
     }
 
-    String getUserIdFromToken() throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new Exception("User is not authenticated");
-        }
-
-        return authentication.getName();
-    }
 
     @Transactional(readOnly = true)
     public List<TinyLinkResponseDTO> getAllTinyLinks() throws Exception {
-        String userId = getUserIdFromToken();
+        String userId = userContextService.getUserIdFromToken();
 
         List<TinyLink> links =
-                tinyLinkRepository.findByUserId(UUID.fromString(userId));
+                tinyLinkRepository.findByUserId(UUID.fromString(userId), LinkStatus.ACTIVE.name());
 
         return links.stream().map(item -> new TinyLinkResponseDTO(
                 item.getTinyCode(), item.getRedirectionUrl(),
@@ -133,13 +127,13 @@ public class TinyLinkService {
     public boolean updateTinyLink(TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
         urlSecurityValidator.validate(tinyLinkUpdateRequestDTO.getRedirectionLink());
 
-        String userId = getUserIdFromToken();
+        String userId = userContextService.getUserIdFromToken();
 
         Optional<TinyLink> tinyLink =
                 tinyLinkRepository.findByTinyCode(tinyLinkUpdateRequestDTO.getTinyCode());
 
         if (tinyLink.isEmpty()) {
-            throw new TinyLinkException("XOXO123", "Tiny Link Not Found");
+            throw new TinyLinkException(ApiErrorCodes.TINY_LINK_NOT_FOUND, "Tiny Link Not Found");
         }
 
         if (!tinyLink.get().getUser().getUserId().toString().equals(userId)) {
@@ -157,7 +151,7 @@ public class TinyLinkService {
     @Transactional
     public boolean updateTinyLinkStatus(TinyLinkStatusUpdateRequestDTO dto) throws Exception {
 
-        String userId = getUserIdFromToken();
+        String userId = userContextService.getUserIdFromToken();
 
         int updated = tinyLinkRepository.updateTinyLinkStatus(
                 UUID.fromString(userId),
@@ -179,5 +173,10 @@ public class TinyLinkService {
             case SPECIAL -> tinyLinkConfiguration.getSpecialUserMaxLinks();
             case CORPORATE -> tinyLinkConfiguration.getCorporateUserMaxLinks();
         };
+    }
+
+    @Transactional
+    public int disableAllLinksForAUser(UUID userId, String status) throws Exception {
+        return tinyLinkRepository.updateAllTinyLinkStatusForAUser(userId, status);
     }
 }

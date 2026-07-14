@@ -3,6 +3,7 @@ package com.abhishek.github.tinylink.repository;
 import com.abhishek.github.tinylink.model.LinkStatus;
 import com.abhishek.github.tinylink.model.TinyLink;
 import com.abhishek.github.tinylink.model.User;
+import com.abhishek.github.tinylink.model.UserStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -51,6 +52,7 @@ public class TinyLinkRepositoryTest {
         user.setPassword("secret");
         user.setCreatedAt(Instant.now());
         user.setUserType(User.UserType.BASE);
+        user.setUserStatus(UserStatus.ACTIVE);
         user = userRepository.save(user);
 
         TinyLink tinyLink = new TinyLink(
@@ -67,7 +69,7 @@ public class TinyLinkRepositoryTest {
         assertThat(found).isPresent();
         assertThat(found.get().getTinyCode()).isEqualTo("ABC12345");
 
-        List<TinyLink> byUser = tinyLinkRepository.findByUserId(user.getUserId());
+        List<TinyLink> byUser = tinyLinkRepository.findByUserId(user.getUserId(), LinkStatus.ACTIVE.name());
         assertThat(byUser).hasSize(1);
 
         long count = tinyLinkRepository.countByUserId(user.getUserId());

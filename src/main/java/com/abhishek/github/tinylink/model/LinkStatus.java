@@ -1,5 +1,5 @@
 package com.abhishek.github.tinylink.model;
 
 public enum LinkStatus {
-    ACTIVE, INACTIVE, EXPIRED, ARCHIVED, BANNED
+    ACTIVE, INACTIVE, EXPIRED, ARCHIVED, BANNED, USER_IS_DELETED
 }
