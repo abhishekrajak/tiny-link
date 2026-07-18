@@ -87,20 +87,25 @@ app.config:
 
 app:
   rate-limiting:
-    defaultLimit:
+    default:
       capacity: 30
       durationMinutes: 60
-    endpoints:
-      createLink:
-        capacity: 30
-        durationMinutes: 60
-      updateLink:
-        capacity: 120
-        durationMinutes: 60
-      deleteLink:
-        capacity: 10
-        durationMinutes: 60
-
+    tiers:
+      BASE:
+        createLink: 10
+        updateLink: 200
+        deleteLink: 50
+        analyticsDashboard: 50
+      SPECIAL:
+        createLink: 20
+        updateLink: 120
+        deleteLink: 10
+        analyticsDashboard: 15
+      CORPORATE:
+        createLink: 5
+        updateLink: 15
+        deleteLink: 5
+        analyticsDashboard: 5
 
 jwt:
   secret: secret-key

@@ -4,6 +4,7 @@ import com.abhishek.github.tinylink.annotation.RateLimited;
 import com.abhishek.github.tinylink.config.EndpointLimitProperties;
 import com.abhishek.github.tinylink.exception.RateLimitException;
 import com.abhishek.github.tinylink.model.CustomUser;
+import com.abhishek.github.tinylink.model.User;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.BucketConfiguration;
@@ -20,6 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -43,15 +45,17 @@ public class RateLimitAspect {
         }
 
         String userId = user.getUsername();
+        User.UserType userType = user.getUserType();
 
-        EndpointLimitProperties.LimitConfig config = limitProperties.getEndpoints()
-                .getOrDefault(rateLimited.policyKey(), limitProperties.getDefaultLimit());
+        String userTier = (userType != null) ? userType.name() : "GUEST";
 
-        long capacity = config.getCapacity();
-        long durationMinutes = config.getDurationMinutes();
+        String endpointKey = rateLimited.policyKey();
 
-        String methodName = joinPoint.getSignature().toShortString();
-        String redisKey = "rate-limit:" + methodName + ":" + userId;
+        int capacity = resolveCapacity(userTier, endpointKey);
+
+        int durationMinutes = limitProperties.getDefaultValue().getDurationMinutes();
+
+        String redisKey = String.format("tier:%s:endpoint:%s:%s", userTier.toUpperCase(), endpointKey, userId);
 
         Supplier<BucketConfiguration> configSupplier = () -> BucketConfiguration.builder()
                 .addLimit(Bandwidth.builder()
@@ -77,6 +81,19 @@ public class RateLimitAspect {
             response.addHeader("Retry-After", String.valueOf(waitTimeSeconds));
         }
 
-        throw new RateLimitException("Rate limit breached for policy field: " + rateLimited.policyKey());
+        throw new RateLimitException("Rate limit breached for your tier matching endpoint limits.");
+    }
+
+    private int resolveCapacity(String tier, String endpoint) {
+        Map<String, Integer> endpointMap = limitProperties.getTiers().get(tier.toUpperCase());
+
+        if (endpointMap != null) {
+            Integer capacity = endpointMap.get(endpoint);
+            if (capacity != null) {
+                return capacity;
+            }
+        }
+
+        return limitProperties.getDefaultValue().getCapacity();
     }
 }

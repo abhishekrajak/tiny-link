@@ -1,8 +1,6 @@
 package com.abhishek.github.tinylink.config;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -14,17 +12,14 @@ import java.util.Map;
 @Data
 public class EndpointLimitProperties {
 
-    // Spring maps any unique key under 'endpoints' directly into this map
-    private Map<String, LimitConfig> endpoints = new HashMap<>();
+    // Maps: Tier Name (e.g., BASE) -> (Endpoint Name -> Capacity Integer)
+    private Map<String, Map<String, Integer>> tiers = new HashMap<>();
 
-    // Global fallback if an endpoint doesn't match any key in the map
-    private LimitConfig defaultLimit = new LimitConfig(30L, 60L);
+    private DefaultConfig defaultValue = new DefaultConfig();
 
     @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class LimitConfig {
-        private long capacity;
-        private long durationMinutes;
+    public static class DefaultConfig {
+        private int capacity = 30;
+        private int durationMinutes = 60;
     }
 }
