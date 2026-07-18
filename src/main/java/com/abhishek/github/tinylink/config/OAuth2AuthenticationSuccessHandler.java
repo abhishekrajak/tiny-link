@@ -1,6 +1,7 @@
 package com.abhishek.github.tinylink.config;
 
 import com.abhishek.github.tinylink.model.CustomOidcUser;
+import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.util.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,10 +38,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             String userId = user.getUserId();
             String email = user.getEmail();
             String name = user.getName();
+            User.UserType userType = user.getUserType();
 
             List<String> roles = user.getRoles();
 
-            String token = jwtTokenUtil.generateToken(userId, email, name, roles);
+            String token = jwtTokenUtil.generateToken(userId, email, name, roles, userType);
 
             String redirectUrl = String.format("%s?token=%s", frontendUrl, token);
 

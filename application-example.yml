@@ -85,6 +85,23 @@ app.config:
   corporate-user-max-links: 1000
   api-base-url: ${API_BASE_URL}
 
+app:
+  rate-limiting:
+    defaultLimit:
+      capacity: 30
+      durationMinutes: 60
+    endpoints:
+      createLink:
+        capacity: 30
+        durationMinutes: 60
+      updateLink:
+        capacity: 120
+        durationMinutes: 60
+      deleteLink:
+        capacity: 10
+        durationMinutes: 60
+
+
 jwt:
   secret: secret-key
   expiration: 360000000

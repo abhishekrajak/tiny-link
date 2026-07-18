@@ -1,5 +1,7 @@
 package com.abhishek.github.tinylink.filter;
 
+import com.abhishek.github.tinylink.model.CustomUser;
+import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.util.JwtTokenUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -41,14 +42,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Set<String> roles = jwtTokenUtil.getRolesFromToken(token);
 
             Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+
+            User.UserType userType = jwtTokenUtil.getUserTypeFromToken(token);
+
             if (roles != null) {
                 for (String role : roles) {
                     authorities.add(new SimpleGrantedAuthority(role));
                 }
             }
 
-            UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                    userId, "", authorities.stream().toList()
+            CustomUser userDetails = new CustomUser(
+                    userId, "", authorities.stream().toList(), userType
             );
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
