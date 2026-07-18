@@ -9,6 +9,10 @@ spring:
             client-id: test-client-id
             client-secret: test-client-secret
             scope: openid,profile,email
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 jwt:
   secret: testSecretKeyForTestingOnly1234567890
@@ -28,3 +32,23 @@ app:
     special-user-max-links: 100
     corporate-user-max-links: 1000
     api-base-url: ${API_BASE_URL}
+  rate-limiting:
+    default-value:
+      capacity: 30
+      durationMinutes: 60
+    tiers:
+      BASE:
+        createLink: 10
+        updateLink: 200
+        deleteLink: 50
+        analyticsDashboard: 50
+      SPECIAL:
+        createLink: 20
+        updateLink: 120
+        deleteLink: 10
+        analyticsDashboard: 15
+      CORPORATE:
+        createLink: 5
+        updateLink: 15
+        deleteLink: 5
+        analyticsDashboard: 5

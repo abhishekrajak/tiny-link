@@ -62,7 +62,8 @@ public class UserService {
                 newUser.getRoles()
                         .stream()
                         .map(Enum::name)
-                        .toList());
+                        .toList(),
+                newUser.getUserType());
 
         return new TinyLinkUserDTO(createdUser.getEmailId(), jwtToken);
     }

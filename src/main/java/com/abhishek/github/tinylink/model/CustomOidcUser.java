@@ -12,6 +12,7 @@ public class CustomOidcUser extends DefaultOidcUser {
     private final String email;
     private final String name;
     private final List<String> roles;
+    private final User.UserType userType;
 
 
     public CustomOidcUser(OidcUser oidcUser, User user) {
@@ -20,6 +21,7 @@ public class CustomOidcUser extends DefaultOidcUser {
         this.email = user.getEmailId();
         this.name = user.getName();
         this.roles = user.getRoles().stream().map(Enum::name).toList();
+        this.userType = user.getUserType();
     }
 
 }

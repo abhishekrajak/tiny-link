@@ -45,7 +45,7 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    public String generateToken(String userId, String email, String name, List<String> roles) {
+    public String generateToken(String userId, String email, String name, List<String> roles, User.UserType userType) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
 
@@ -55,6 +55,7 @@ public class JwtTokenUtil {
                 .claim("email", email)
                 .claim("name", name)
                 .claim("roles", roles)
+                .claim("userType", userType.name())
                 .issuer(issuer)
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -105,5 +106,24 @@ public class JwtTokenUtil {
             return new HashSet<>((List<String>) rolesObj);
         }
         return Collections.emptySet();
+    }
+
+    public User.UserType getUserTypeFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        Object userType = claims.get("userType");
+        if (userType instanceof String jwtUserType){
+            try {
+                return User.UserType.valueOf(jwtUserType);
+            } catch (Exception e){
+                // TODO throw special Exception for this
+                return null;
+            }
+        }
+        return null;
     }
 }

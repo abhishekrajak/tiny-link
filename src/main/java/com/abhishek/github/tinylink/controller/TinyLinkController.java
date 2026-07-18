@@ -1,5 +1,6 @@
 package com.abhishek.github.tinylink.controller;
 
+import com.abhishek.github.tinylink.annotation.RateLimited;
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
 import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.dto.*;
@@ -50,6 +51,7 @@ public class TinyLinkController {
             )
     })
     @SecurityRequirement(name = "BearerAuth")
+    @RateLimited(policyKey = "createLink")
     @PostMapping(value = "/api/v1/tiny-link")
     public ApiResponse<?> addTinyLink(@RequestBody @Valid TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
         TinyLinkResponseDTO savedTinyLink = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
