@@ -72,22 +72,21 @@ springdoc:
       - url: ${API_BASE_URL}
         description: Dynamic Server
 
-app.config:
-  tiny-url-code-length: 7
-  tiny-url-code-min-length: 7
-  tiny-url-code-max-length: 20
-  tiny-link-allowed-chars: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
-  short-code-generation-max-retry-count: 5
-  redirect-url: http://localhost:3000/auth.html
-  base-url: http://localhost:3000
-  base-user-max-links: 50
-  special-user-max-links: 100
-  corporate-user-max-links: 1000
-  api-base-url: ${API_BASE_URL}
-
 app:
+  config:
+    redirect-url: http://localhost:3000
+    tiny-url-code-length: 7
+    tiny-url-code-min-length: 7
+    tiny-url-code-max-length: 20
+    tiny-link-allowed-chars: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+    short-code-generation-max-retry-count: 5
+    base-url: http://localhost:3000
+    base-user-max-links: 50
+    special-user-max-links: 100
+    corporate-user-max-links: 1000
+    api-base-url: ${API_BASE_URL}
   rate-limiting:
-    default:
+    default-value:
       capacity: 30
       durationMinutes: 60
     tiers:
