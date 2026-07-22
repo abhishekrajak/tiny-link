@@ -8,7 +8,10 @@ spring:
           google:
             client-id: test-client-id
             client-secret: test-client-secret
-            scope: openid,profile,email
+            scope:
+              - email
+              - profile
+              - openid
   data:
     redis:
       host: localhost
@@ -38,17 +41,20 @@ app:
       durationMinutes: 60
     tiers:
       BASE:
-        createLink: 10
-        updateLink: 200
-        deleteLink: 50
+        createTinyLink: 10
+        updateTinyLink: 20
+        deactivateTinyLink: 10
+        deleteTinyLink: 50
         analyticsDashboard: 50
       SPECIAL:
-        createLink: 20
-        updateLink: 120
-        deleteLink: 10
+        createTinyLink: 10
+        updateTinyLink: 20
+        deactivateTinyLink: 10
+        deleteTinyLink: 50
         analyticsDashboard: 15
       CORPORATE:
-        createLink: 5
-        updateLink: 15
-        deleteLink: 5
+        createTinyLink: 10
+        updateTinyLink: 20
+        deactivateTinyLink: 10
+        deleteTinyLink: 50
         analyticsDashboard: 5

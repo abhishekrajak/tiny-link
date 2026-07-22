@@ -51,7 +51,7 @@ public class TinyLinkController {
             )
     })
     @SecurityRequirement(name = "BearerAuth")
-    @RateLimited(policyKey = "createLink")
+    @RateLimited(policyKey = "createTinyLink")
     @PostMapping(value = "/api/v1/tiny-link")
     public ApiResponse<?> addTinyLink(@RequestBody @Valid TinyLinkGenerateRequestDTO tinyLinkGenerateRequest) throws Exception {
         TinyLinkResponseDTO savedTinyLink = tinyLinkService.insertTinyLink(tinyLinkGenerateRequest);
@@ -79,6 +79,7 @@ public class TinyLinkController {
             )
     })
     @SecurityRequirement(name = "BearerAuth")
+    @RateLimited(policyKey = "updateTinyLink")
     @PatchMapping(value = "/api/v1/tiny-link/url")
     public ApiResponse<?> updateTinyLink(@RequestBody @Valid TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
         boolean isSuccess = tinyLinkService.updateTinyLink(tinyLinkUpdateRequestDTO);
@@ -168,7 +169,7 @@ public class TinyLinkController {
             // Nothing to do add logs later
         }
 
-        return new ApiResponse<>("XOXO", "NO DATA FOUND", null);
+        return new ApiResponse<>(ApiErrorCodes.unknownErrorCode, ApiErrorMessages.unknownErrorMessage, null);
     }
 
     @Operation(
@@ -188,6 +189,7 @@ public class TinyLinkController {
             )
     })
     @SecurityRequirement(name = "BearerAuth")
+    @RateLimited(policyKey = "deactivateTinyLink")
     @PatchMapping(value = "/api/v1/tiny-link/status/deactivate")
     public ApiResponse<?> updateTinyLinkStatus(
             @Valid @RequestBody

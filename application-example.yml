@@ -91,19 +91,22 @@ app:
       durationMinutes: 60
     tiers:
       BASE:
-        createLink: 10
-        updateLink: 200
-        deleteLink: 50
+        createTinyLink: 10
+        updateTinyLink: 20
+        deactivateTinyLink: 10
+        deleteTinyLink: 50
         analyticsDashboard: 50
       SPECIAL:
-        createLink: 20
-        updateLink: 120
-        deleteLink: 10
+        createTinyLink: 10
+        updateTinyLink: 20
+        deactivateTinyLink: 10
+        deleteTinyLink: 50
         analyticsDashboard: 15
       CORPORATE:
-        createLink: 5
-        updateLink: 15
-        deleteLink: 5
+        createTinyLink: 10
+        updateTinyLink: 20
+        deactivateTinyLink: 10
+        deleteTinyLink: 50
         analyticsDashboard: 5
 
 jwt:
