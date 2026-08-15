@@ -14,7 +14,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -149,8 +155,8 @@ public class TinyLinkController {
     }
 
     @Operation(
-            summary = "Retrieve all tiny links",
-            description = "Retrieves a list of all tiny links stored in the system."
+            summary = "Retrieve tiny links page wise",
+            description = "Retrieves a list of tiny links based on page number and page size."
     )
     @io.swagger.v3.oas.annotations.responses.ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -161,9 +167,16 @@ public class TinyLinkController {
     })
     @SecurityRequirement(name = "BearerAuth")
     @GetMapping(value = "/api/v1/links")
-    public ApiResponse<?> getTinyLinkTest() {
+    public ApiResponse<?> getTinyLinks(@ParameterObject Pageable pageable) {
+
+        int size = Math.min(100, Math.max(1, pageable.getPageSize()));
+        int page = Math.max(0, pageable.getPageNumber());
+
+        Sort sort = pageable.getSort().isSorted() ? pageable.getSort() : Sort.by("createdAt").descending();
+        Pageable safePageable = PageRequest.of(page, size, sort);
+
         try {
-            List<TinyLinkResponseDTO> links = tinyLinkService.getAllTinyLinks();
+            Page<TinyLinkResponseDTO> links = tinyLinkService.getAllTinyLinks(safePageable);
             return ApiResponse.success(links);
         } catch (Exception e) {
             // Nothing to do add logs later

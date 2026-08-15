@@ -7,6 +7,9 @@ import com.abhishek.github.tinylink.model.UserStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -69,7 +72,9 @@ public class TinyLinkRepositoryTest {
         assertThat(found).isPresent();
         assertThat(found.get().getTinyCode()).isEqualTo("ABC12345");
 
-        List<TinyLink> byUser = tinyLinkRepository.findByUserId(user.getUserId(), LinkStatus.ACTIVE);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<TinyLink> byUser = tinyLinkRepository.findByUserId(user.getUserId(), LinkStatus.ACTIVE, pageable);
         assertThat(byUser).hasSize(1);
 
         long count = tinyLinkRepository.countByUserId(user.getUserId());

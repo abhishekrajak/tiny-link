@@ -13,6 +13,8 @@ import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.util.TinyCodeValidatorUtil;
 import com.abhishek.github.tinylink.util.UrlGenerator;
 import com.abhishek.github.tinylink.util.UrlSecurityValidator;
+import org.springframework.data.domain.*;
+
 import io.opencensus.trace.Link;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -111,17 +113,17 @@ public class TinyLinkService {
 
 
     @Transactional(readOnly = true)
-    public List<TinyLinkResponseDTO> getAllTinyLinks() throws Exception {
+    public Page<TinyLinkResponseDTO> getAllTinyLinks(Pageable pageable) throws Exception {
         String userId = userContextService.getUserIdFromToken();
 
-        List<TinyLink> links =
-                tinyLinkRepository.findByUserId(UUID.fromString(userId), LinkStatus.ACTIVE);
+        Page<TinyLink> links =
+                tinyLinkRepository.findByUserId(UUID.fromString(userId), LinkStatus.ACTIVE, pageable);
 
-        return links.stream().map(item -> new TinyLinkResponseDTO(
+        return links.map(item -> new TinyLinkResponseDTO(
                 item.getTinyCode(), item.getRedirectionUrl(),
                 item.isCustom(), item.getCreatedAt(), null,
                 String.format("%s/%s", tinyLinkConfiguration.getApiBaseUrl(), item.getTinyCode())
-        )).collect(Collectors.toList());
+        ));
     }
 
     public boolean updateTinyLink(TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
