@@ -13,20 +13,16 @@ import com.abhishek.github.tinylink.repository.UserRepository;
 import com.abhishek.github.tinylink.util.TinyCodeValidatorUtil;
 import com.abhishek.github.tinylink.util.UrlGenerator;
 import com.abhishek.github.tinylink.util.UrlSecurityValidator;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.*;
 
-import io.opencensus.trace.Link;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.abhishek.github.tinylink.constant.StringConstants.BLANK;
 
@@ -126,6 +122,7 @@ public class TinyLinkService {
         ));
     }
 
+    @CacheEvict(value = "redirectionUrls", key = "#tinyLinkUpdateRequestDTO.tinyCode")
     public boolean updateTinyLink(TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
         urlSecurityValidator.validate(tinyLinkUpdateRequestDTO.getRedirectionLink());
 
@@ -151,6 +148,7 @@ public class TinyLinkService {
     }
 
     @Transactional
+    @CacheEvict(value = "redirectionUrls", key = "#dto.tinyCode")
     public boolean updateTinyLinkStatus(TinyLinkStatusUpdateRequestDTO dto) throws Exception {
 
         String userId = userContextService.getUserIdFromToken();
@@ -178,7 +176,7 @@ public class TinyLinkService {
     }
 
     @Transactional
-    public int disableAllLinksForAUser(UUID userId, String status) throws Exception {
+    public int disableAllLinksForAUser(UUID userId, String status) {
         return tinyLinkRepository.updateAllTinyLinkStatusForAUser(userId, status);
     }
 }
