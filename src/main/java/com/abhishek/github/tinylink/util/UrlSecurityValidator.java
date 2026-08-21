@@ -14,7 +14,7 @@ import java.util.Set;
 public class UrlSecurityValidator {
     private final TinyLinkConfiguration config;
 
-    private static final Set<String> ALLOWED_SCHEMES = Set.of("http", "https", "tel", "mailto", "sms");
+    private static final Set<String> ALLOWED_SCHEMES = Set.of("http", "https");
 
 
     public void validate(String url) throws TinyLinkException {
@@ -45,10 +45,42 @@ public class UrlSecurityValidator {
                         String.format("Only the following protocols are allowed : %s",
                                 String.join(" ", ALLOWED_SCHEMES)));
             }
+
+            String host = uri.getHost();
+            if (host == null || host.isEmpty()) {
+                throw new TinyLinkException(ApiErrorCodes.INVALID_URL, "URL must contain a valid host");
+            }
+
+            if (!isValidDomain(host)) {
+                throw new TinyLinkException(ApiErrorCodes.INVALID_URL,
+                        "Invalid domain format - must contain a valid TLD (e.g., .com, .org, .net)");
+            }
         } catch (TinyLinkException e){
             throw e;
         } catch (Exception e) {
             throw new TinyLinkException(ApiErrorCodes.INVALID_URL, "Malformed URL provided");
         }
+    }
+
+    private boolean isValidDomain(String host) {
+        if (host == null || host.isEmpty() || host.length() > 253) {
+            return false;
+        }
+
+        String[] labels = host.split("\\.");
+        if (labels.length < 2) {
+            return false;
+        }
+
+        for (String label : labels) {
+            if (label.isEmpty() || label.length() > 63) {
+                return false;
+            }
+            if (!label.matches("^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$")) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -16,7 +16,7 @@ TinyLink is a production-ready URL shortening service built with Spring Boot. It
 - **Error Redirection**: Custom error page for invalid or expired links.
 - **Caching**: Redis-backed caching for faster redirection lookup with cache eviction on updates.
 - **Rate Limiting**: Tier-based API rate limiting using Bucket4j + Redis + AOP, configurable per endpoint and user tier.
-- **Security Hardening**: SSRF protection, self-referencing URL validation, protocol allow-listing (http/https/tel/mailto/sms), and CORS origin mapping.
+- **Security Hardening**: SSRF protection, self-referencing URL validation, protocol allow-listing (http/https), and CORS origin mapping.
 - **Observability**: Spring Actuator health endpoints and Prometheus metrics via Micrometer.
 - **API Documentation**: Interactive Swagger UI via Springdoc OpenAPI.
 - **Database Migrations**: Schema versioning and evolution managed by Flyway.
@@ -341,7 +341,7 @@ Standardized API response wrapper:
 - **JWT Stateless Authentication**: Token-based request authorization without server-side sessions.
 - **Google OAuth 2.0 Integration**: Secure third-party login with OIDC.
 - **SSRF Protection**: URL validation blocks internal network access (`localhost`, `127.0.0.1`) and self-referencing requests to the service itself.
-- **Protocol Allow-Listing**: Only `http`, `https`, `tel`, `mailto`, and `sms` schemes are permitted.
+- **Protocol Allow-Listing**: Only `http` and `https` schemes are permitted.
 - **CORS Origin Mapping**: Restricted to the configured frontend base URL.
 - **CSRF Protection**: Disabled for stateless REST API.
 - **Rate Limiting**: Distributed per-user-tier throttling via Bucket4j + Redis.

@@ -1,0 +1,45 @@
+# Default owner for everything
+*       @abhishekrajak
+
+# Core application code
+src/main/java/com/abhishek/github/tinylink/        @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/config/  @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/service/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/controller/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/repository/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/model/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/dto/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/util/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/exception/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/annotation/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/aspect/ @abhishekrajak
+src/main/java/com/abhishek/github/tinylink/filter/ @abhishekrajak
+
+# Database migrations
+src/main/resources/db/migration/  @abhishekrajak
+
+# Configuration and properties
+src/main/resources/application*.yml  @abhishekrajak
+src/main/resources/application*.yaml @abhishekrajak
+pom.xml  @abhishekrajak
+
+# Tests
+src/test/  @abhishekrajak
+
+# Documentation
+README.md  @abhishekrajak
+LICENSE  @abhishekrajak
+
+# Docker and deployment
+Dockerfile  @abhishekrajak
+docker-compose.yml  @abhishekrajak
+.dockerignore  @abhishekrajak
+.gitignore  @abhishekrajak
+
+# IDE and OS files
+.idea/  @abhishekrajak
+.DS_Store  @abhishekrajak
+
+# Build artifacts
+target/  @abhishekrajak
+logs/  @abhishekrajak
