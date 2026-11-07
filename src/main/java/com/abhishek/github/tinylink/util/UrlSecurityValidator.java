@@ -2,6 +2,7 @@ package com.abhishek.github.tinylink.util;
 
 import com.abhishek.github.tinylink.config.TinyLinkConfiguration;
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
+import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.exception.TinyLinkException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,10 +20,10 @@ public class UrlSecurityValidator {
 
     public void validate(String url) throws TinyLinkException {
         if (isSelfReferencing(url)) {
-            throw new TinyLinkException(ApiErrorCodes.SELF_REFERENCING_URL, "URL cannot point back to this service");
+            throw new TinyLinkException(ApiErrorCodes.SELF_REFERENCING_URL, ApiErrorMessages.selfReferencingUrl);
         }
         if (isInternalNetwork(url)) {
-            throw new TinyLinkException(ApiErrorCodes.INTERNAL_URL_FORBIDDEN, "Internal network URLs are not allowed");
+            throw new TinyLinkException(ApiErrorCodes.INTERNAL_URL_FORBIDDEN, ApiErrorMessages.internalUrlForbidden);
         }
         validateProtocol(url);
     }
@@ -42,23 +43,23 @@ public class UrlSecurityValidator {
 
             if (scheme == null || !ALLOWED_SCHEMES.contains(scheme)){
                 throw new TinyLinkException(ApiErrorCodes.INVALID_URL,
-                        String.format("Only the following protocols are allowed : %s",
+                        String.format(ApiErrorMessages.invalidUrlProtocol,
                                 String.join(" ", ALLOWED_SCHEMES)));
             }
 
             String host = uri.getHost();
             if (host == null || host.isEmpty()) {
-                throw new TinyLinkException(ApiErrorCodes.INVALID_URL, "URL must contain a valid host");
+                throw new TinyLinkException(ApiErrorCodes.INVALID_URL, ApiErrorMessages.invalidUrlHost);
             }
 
             if (!isValidDomain(host)) {
                 throw new TinyLinkException(ApiErrorCodes.INVALID_URL,
-                        "Invalid domain format - must contain a valid TLD (e.g., .com, .org, .net)");
+                        ApiErrorMessages.invalidDomain);
             }
         } catch (TinyLinkException e){
             throw e;
         } catch (Exception e) {
-            throw new TinyLinkException(ApiErrorCodes.INVALID_URL, "Malformed URL provided");
+            throw new TinyLinkException(ApiErrorCodes.INVALID_URL, ApiErrorMessages.malformedUrl);
         }
     }
 

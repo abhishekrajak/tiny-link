@@ -1,6 +1,7 @@
 package com.abhishek.github.tinylink.service;
 
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
+import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.exception.TinyLinkException;
 import com.abhishek.github.tinylink.model.User;
 import com.abhishek.github.tinylink.repository.UserRepository;
@@ -19,7 +20,7 @@ public class RoleService {
 
     public void assignRole(String email, User.UserRole role) {
         User user = userRepository.findByEmailId(email)
-                .orElseThrow(() -> new TinyLinkException(ApiErrorCodes.userNotFound, "User not found."));
+                .orElseThrow(() -> new TinyLinkException(ApiErrorCodes.userNotFound, ApiErrorMessages.userNotFound));
         user.getRoles().add(role);
         userRepository.save(user);
     }

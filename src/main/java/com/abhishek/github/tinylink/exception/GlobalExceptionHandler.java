@@ -41,15 +41,15 @@ public class GlobalExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElse("Validation failed");
+                .orElse(ApiErrorMessages.validationFailed);
 
-        return new ApiResponse<>("VALIDATION_ERROR", errorMessage, null);
+        return new ApiResponse<>(ApiErrorCodes.VALIDATION_ERROR, errorMessage, null);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<?> handleAccessDeniedException(AccessDeniedException ex) {
-        return new ApiResponse<>("ACCESS_DENIED", ex.getMessage(), null);
+        return new ApiResponse<>(ApiErrorCodes.ACCESS_DENIED, ex.getMessage(), null);
     }
 
     @ExceptionHandler(RateLimitException.class)

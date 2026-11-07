@@ -2,6 +2,7 @@ package com.abhishek.github.tinylink.config;
 
 import com.abhishek.github.tinylink.model.CustomOidcUser;
 import com.abhishek.github.tinylink.model.User;
+import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.util.JwtTokenUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -48,7 +49,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
             getRedirectStrategy().sendRedirect(request, response, redirectUrl);
         } catch (Exception e) {
-            response.sendError(HttpStatus.OK.value(), "Auth done but token gen failed");
+            response.sendError(HttpStatus.OK.value(), ApiErrorMessages.authTokenGenerationFailed);
         }
     }
 }
