@@ -1,6 +1,7 @@
 package com.abhishek.github.tinylink.service;
 
 import com.abhishek.github.tinylink.constant.ApiErrorCodes;
+import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import com.abhishek.github.tinylink.config.TinyLinkConfiguration;
 import com.abhishek.github.tinylink.dto.*;
 import com.abhishek.github.tinylink.exception.AccessDeniedException;
@@ -52,6 +53,10 @@ public class TinyLinkService {
             return BLANK;
         }
 
+        if (tinyLink.get().getStatus() != LinkStatus.ACTIVE) {
+            return BLANK;
+        }
+
         TinyLinkDTO tinyLinkDTO = new TinyLinkDTO(tinyLink.get());
         return tinyLinkDTO.getRedirectionLink();
     }
@@ -75,7 +80,7 @@ public class TinyLinkService {
         boolean tinyCodeAlreadyExists = tinyLinkRepository.existsTinyLinkByTinyCode(tinyCode);
 
         if (tinyCodeAlreadyExists) {
-            throw new TinyLinkException(ApiErrorCodes.tinyCodeGenerationRetryFail, "This tinyCode is already taken, please try with some other value");
+            throw new TinyLinkException(ApiErrorCodes.tinyCodeGenerationRetryFail, ApiErrorMessages.tinyCodeAlreadyTaken);
         }
 
         // Check link limit for user
@@ -101,7 +106,7 @@ public class TinyLinkService {
         Optional<User> user = userRepository.findById(UUID.fromString(userId));
 
         if (user.isEmpty()) {
-            throw new TinyLinkException(ApiErrorCodes.userNotFound, "User not found");
+            throw new TinyLinkException(ApiErrorCodes.userNotFound, ApiErrorMessages.userNotFound);
         }
 
         return user.get();
@@ -132,7 +137,7 @@ public class TinyLinkService {
                 tinyLinkRepository.findByTinyCode(tinyLinkUpdateRequestDTO.getTinyCode());
 
         if (tinyLink.isEmpty()) {
-            throw new TinyLinkException(ApiErrorCodes.TINY_LINK_NOT_FOUND, "Tiny Link Not Found");
+            throw new TinyLinkException(ApiErrorCodes.TINY_LINK_NOT_FOUND, ApiErrorMessages.tinyLinkNotFound);
         }
 
         if (!tinyLink.get().getUser().getUserId().toString().equals(userId)) {
@@ -160,7 +165,7 @@ public class TinyLinkService {
         );
 
         if (updated == 0) {
-            throw new TinyLinkException("LINK_NOT_FOUND", "Tiny Link not found or access denied");
+            throw new TinyLinkException(ApiErrorCodes.TINY_LINK_NOT_FOUND, ApiErrorMessages.tinyLinkNotFoundOrAccessDenied);
         }
 
         return true;

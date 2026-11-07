@@ -90,7 +90,7 @@ public class TinyLinkController {
     public ApiResponse<?> updateTinyLink(@RequestBody @Valid TinyLinkUpdateRequestDTO tinyLinkUpdateRequestDTO) throws Exception {
         boolean isSuccess = tinyLinkService.updateTinyLink(tinyLinkUpdateRequestDTO);
         if (isSuccess) {
-            return ApiResponse.success("Tiny Link Updated Successfully");
+            return ApiResponse.success(ApiErrorMessages.tinyLinkUpdatedSuccessfully);
         }
         throw new Exception();
     }
@@ -147,7 +147,7 @@ public class TinyLinkController {
         String url = tinyLinkService.getRedirectionUrl(tinyCode);
 
         if (url == null || url.isEmpty()) {
-            return new ApiResponse<>(ApiErrorCodes.INVALID_TINY_CODE, "No URL with this tinyCode", null);
+            return new ApiResponse<>(ApiErrorCodes.INVALID_TINY_CODE, ApiErrorMessages.noUrlWithTinyCode, null);
         } else {
             return ApiResponse.success(url);
         }

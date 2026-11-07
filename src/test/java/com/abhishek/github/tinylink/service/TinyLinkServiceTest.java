@@ -123,6 +123,27 @@ class TinyLinkServiceTest {
         verify(TinyLinkServiceTest.this.tinyLinkRepository).findByTinyCode(tinyCode);
     }
 
+    @Test
+    @DisplayName("Inactive tiny links do not return a redirect URL")
+    void getRedirectionUrlIfTinyLinkIsInactive() {
+        String tinyCode = "ABHI1331";
+        TinyLink tinyLink = new TinyLink(
+                tinyCode,
+                "https://www.twitter.com",
+                null,
+                false,
+                "",
+                LinkStatus.INACTIVE
+        );
+
+        when(tinyLinkRepository.findByTinyCode(tinyCode)).thenReturn(Optional.of(tinyLink));
+
+        String actualResult = tinyLinkService.getRedirectionUrl(tinyCode);
+
+        assertEquals("", actualResult);
+        verify(tinyLinkRepository).findByTinyCode(tinyCode);
+    }
+
 
     @Test
     void insertTinyLink_success_generatesShortCode_andSaves() throws Exception {

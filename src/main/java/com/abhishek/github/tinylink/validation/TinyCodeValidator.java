@@ -1,6 +1,7 @@
 package com.abhishek.github.tinylink.validation;
 
 import com.abhishek.github.tinylink.config.TinyLinkConfiguration;
+import com.abhishek.github.tinylink.constant.ApiErrorMessages;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class TinyCodeValidator implements ConstraintValidator<ValidTinyCode, Str
         if (!isValid) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
-                    String.format("Tiny code must be between %d and %d characters", min, max)
+                    String.format(ApiErrorMessages.tinyCodeLength, min, max)
             ).addConstraintViolation();
         }
 
