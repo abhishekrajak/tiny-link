@@ -52,6 +52,10 @@ public class TinyLinkService {
             return BLANK;
         }
 
+        if (tinyLink.get().getStatus() != LinkStatus.ACTIVE) {
+            return BLANK;
+        }
+
         TinyLinkDTO tinyLinkDTO = new TinyLinkDTO(tinyLink.get());
         return tinyLinkDTO.getRedirectionLink();
     }
