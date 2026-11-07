@@ -8,10 +8,16 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tiny-link
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    networks:
+      app_network:
     restart: unless-stopped  # Recommended for production
 
   postgres:
@@ -29,6 +35,20 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d tiny-link"]
       interval: 5s
       timeout: 5s
+      retries: 5
+    networks:
+      app_network:
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
       retries: 5
     networks:
       app_network:
@@ -55,3 +75,4 @@ networks:
 volumes:
   postgres_data:  # Declare volume for persistence
   pgadmin_data:   # Declare volume for persistence
+  redis_data:     # Declare volume for persistence
